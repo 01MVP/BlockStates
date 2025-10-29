@@ -24,6 +24,11 @@ class MapDiff {
     }
   }
 
+  // Fast array comparison without JSON.stringify
+  private areTilesEqual(a: TileProp, b: TileProp): boolean {
+    return a[0] === b[0] && a[1] === b[1] && a[2] === b[2];
+  }
+
   patch(blockMap: Block[][]): Promise<void> {
     let curMap = blockMap.flat().map((b) => b.getView());
     if (!this.prevMap) {
@@ -31,7 +36,7 @@ class MapDiff {
     } else {
       this.data = [];
       for (let i = 0; i < curMap.length; ++i) {
-        if (JSON.stringify(this.prevMap[i]) === JSON.stringify(curMap[i])) {
+        if (this.areTilesEqual(this.prevMap[i], curMap[i])) {
           this.addSame();
         } else {
           this.endSame();

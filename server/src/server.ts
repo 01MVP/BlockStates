@@ -311,21 +311,29 @@ async function handleDisconnectInRoom(room: Room, player: Player, io: Server) {
 
     room.forceStartNum = room.players.filter(player => player.forceStart).length;
     if (room.players.length < 1 && !room.keepAlive) {
+      // Clean up game loop before deleting room to prevent memory leak
+      if (room.gameLoop) {
+        clearInterval(room.gameLoop);
+        room.gameLoop = null;
+      }
       delete roomPool[room.id];
     } else {
       if (room.players[0]) room.players[0].setRoomHost(true);
     }
     io.in(room.id).emit('update_room', room);
   } catch (e: any) {
-    console.error(JSON.stringify(e, ['message', 'arguments', 'type', 'name']));
-    console.log(e.stack);
+    console.error('Error in handleDisconnectInRoom:', e.message);
+    if (process.env.NODE_ENV === 'development') {
+      console.log(e.stack);
+    }
   }
 }
 
 async function checkForcedStart(room: Room, io: Server) {
   let forceStartNum = forceStartOK[room.players.filter((player) => !player.spectating()).length];
 
-  if (!room.gameStarted && room.forceStartNum >= forceStartNum) {
+  // Prevent race condition: only start if not already started or starting
+  if (!room.gameStarted && !room.gameLoop && room.forceStartNum >= forceStartNum) {
     await handleGame(room, io);
   }
 }
@@ -503,8 +511,18 @@ async function handleGame(room: Room, io: Server) {
           }
         }
       } catch (e: any) {
-        console.error(JSON.stringify(e, ['message', 'arguments', 'type', 'name']));
+        console.error('Fatal error in game loop:', e.message);
         console.log(e.stack);
+        // Clean up game loop to prevent memory leak
+        if (room.gameLoop) {
+          clearInterval(room.gameLoop);
+          room.gameLoop = null;
+        }
+        // Reset game state
+        room.gameStarted = false;
+        room.forceStartNum = 0;
+        io.in(room.id).emit('update_room', room);
+        io.in(room.id).emit('room_message', null, 'Game stopped due to error.');
       }
     }, updTime);
   }
@@ -558,8 +576,10 @@ io.on('connection', async (socket) => {
       await createRoom(roomId);
     } catch (e: any) {
       reject_join(socket, e.message);
-      console.error(JSON.stringify(e, ['message', 'arguments', 'type', 'name']));
-      console.log(e.stack);
+      console.error('Error in createRoom:', e.message);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(e.stack);
+      }
     }
     // return;
   }
@@ -801,6 +821,8 @@ io.on('connection', async (socket) => {
 
   socket.on('disconnect', async () => {
     await handleDisconnectInRoom(room, player, io);
+    // Clean up all event listeners to prevent memory leak
+    socket.removeAllListeners();
     socket.disconnect();
     checkForcedStart(room, io); // check if game can start
   });
@@ -821,8 +843,10 @@ io.on('connection', async (socket) => {
 
       checkForcedStart(room, io);
     } catch (e: any) {
-      console.log(e.stack);
-      console.error(JSON.stringify(e, ['message', 'arguments', 'type', 'name']));
+      console.log('Error in force_start:', e.message);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(e.stack);
+      }
     }
   });
 
@@ -888,8 +912,10 @@ io.on('connection', async (socket) => {
         }
       }
     } catch (e: any) {
-      console.log(e.stack);
-      console.error(JSON.stringify(e, ['message', 'arguments', 'type', 'name']));
+      console.log('Error in attack:', e.message);
+      if (process.env.NODE_ENV === 'development') {
+        console.log(e.stack);
+      }
     }
   });
 });
