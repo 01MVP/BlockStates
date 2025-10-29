@@ -29,6 +29,15 @@ class GameMap {
   map: Block[][];
   turn: number;
   minKingDistance: number;
+  // Object pool for Block instances to reduce GC pressure
+  private blockPool: Block[] = [];
+  // Cache for player statistics to avoid O(n²) calculations
+  private playerStatsCache: Map<any, { army: number; land: number; dirty: boolean }> = new Map();
+  // Active tiles lists for efficient updateUnit()
+  private kingTiles: Block[] = [];
+  private cityTiles: Block[] = [];
+  private swampTiles: Block[] = [];
+  private occupiedPlains: Set<Block> = new Set();
 
   constructor(
     public id: string,
@@ -150,12 +159,11 @@ class GameMap {
       let pos = null;
       if (this.players[i].king) continue;
       if (this.players[i].spectating()) continue;
-      let attempts = 0;
-      const maxAttempts = 15;
-      while (true) {
-        if (attempts >= maxAttempts) {
-          throw new Error('Failed to place king after ' + maxAttempts + ' attempts');
-        }
+
+      const maxAttempts = 100;  // Increased from 15 to reduce failure rate
+      let placed = false;
+
+      for (let attempts = 0; attempts < maxAttempts; attempts++) {
         let x = getRandomInt(0, this.width);
         let y = getRandomInt(0, this.height);
         pos = new Point(x, y);
@@ -182,10 +190,14 @@ class GameMap {
             block.initKing(this.players[i]);
             if (this.revealKing) block.isAlwaysRevealed = true;
             this.players[i].initKing(block);
+            placed = true;
             break;
           }
         }
-        attempts++;
+      }
+
+      if (!placed) {
+        throw new Error(`Failed to place king for player ${i} after ${maxAttempts} attempts. Map may be too small or too crowded.`);
       }
     }
   }
@@ -239,6 +251,10 @@ class GameMap {
     if (players.length > kings.length)
       map.assign_random_king();
 
+    // Initialize active tiles and player stats cache
+    map.initActiveTiles();
+    map.initPlayerStatsCache();
+
     return map;
   }
 
@@ -251,15 +267,26 @@ class GameMap {
     // Generate the king
     this.assign_random_king();
 
+    // Initialize player stats cache after kings are placed
+    this.initPlayerStatsCache();
+
     // console.log('Kings generated successfully');
     // Generate the mountain
     for (let i = 1; i <= this.mountain; ++i) {
       let generated = false;
       for (let count = 3, x, y; count; --count) {
-        while (true) {
+        // Add safety counter to prevent infinite loop
+        let searchAttempts = 0;
+        const maxSearchAttempts = this.width * this.height;
+        while (searchAttempts < maxSearchAttempts) {
           x = getRandomInt(0, this.width);
           y = getRandomInt(0, this.height);
           if (this.isPlain(this.map[x][y])) break;
+          searchAttempts++;
+        }
+        if (searchAttempts >= maxSearchAttempts) {
+          console.warn(`Cannot find plain tile for mountain ${i}, stopping mountain generation`);
+          break;
         }
         this.map[x][y].type = TileType.Mountain;
         if (this.checkConnection(i)) {
@@ -280,10 +307,18 @@ class GameMap {
     for (let i = 1; i <= this.city; ++i) {
       let generated = false;
       for (let count = 3, x, y; count; --count) {
-        while (true) {
+        // Add safety counter to prevent infinite loop
+        let searchAttempts = 0;
+        const maxSearchAttempts = this.width * this.height;
+        while (searchAttempts < maxSearchAttempts) {
           x = getRandomInt(0, this.width);
           y = getRandomInt(0, this.height);
           if (this.isPlain(this.map[x][y])) break;
+          searchAttempts++;
+        }
+        if (searchAttempts >= maxSearchAttempts) {
+          console.warn(`Cannot find plain tile for city ${i}, stopping city generation`);
+          break;
         }
         this.map[x][y].type = TileType.City;
         if (this.checkConnection(i + this.mountain)) {
@@ -303,28 +338,110 @@ class GameMap {
     // console.log('Cities generated successfully');
     // Generate the swamp.
     for (let i = 1, x, y; i <= this.swamp; ++i) {
-      while (true) {
+      // Add safety counter to prevent infinite loop
+      let searchAttempts = 0;
+      const maxSearchAttempts = this.width * this.height;
+      let found = false;
+      while (searchAttempts < maxSearchAttempts) {
         x = getRandomInt(0, this.width);
         y = getRandomInt(0, this.height);
-        if (this.isPlain(this.map[x][y])) break;
+        if (this.isPlain(this.map[x][y])) {
+          found = true;
+          break;
+        }
+        searchAttempts++;
+      }
+      if (!found) {
+        console.warn(`Cannot find plain tile for swamp ${i}, stopping at ${i - 1} swamps`);
+        this.swamp = i - 1;
+        break;
       }
       this.map[x][y].type = TileType.Swamp;
     }
     // console.log('Swamps generated successfully');
+
+    // Initialize active tiles after map generation is complete
+    this.initActiveTiles();
+  }
+
+  // Register a tile in the active lists for efficient updateUnit()
+  private registerActiveTile(block: Block): void {
+    switch (block.type) {
+      case TileType.King:
+        if (!this.kingTiles.includes(block)) {
+          this.kingTiles.push(block);
+        }
+        break;
+      case TileType.City:
+        if (!this.cityTiles.includes(block)) {
+          this.cityTiles.push(block);
+        }
+        break;
+      case TileType.Swamp:
+        if (!this.swampTiles.includes(block)) {
+          this.swampTiles.push(block);
+        }
+        break;
+      case TileType.Plain:
+        if (block.player) {
+          this.occupiedPlains.add(block);
+        }
+        break;
+    }
+  }
+
+  // Initialize active tiles from the map
+  private initActiveTiles(): void {
+    for (let i = 0; i < this.width; i++) {
+      for (let j = 0; j < this.height; j++) {
+        this.registerActiveTile(this.map[i][j]);
+      }
+    }
+  }
+
+  // Initialize player stats cache
+  private initPlayerStatsCache(): void {
+    for (const player of this.players) {
+      this.playerStatsCache.set(player, { army: 0, land: 0, dirty: true });
+    }
+  }
+
+  // Mark player stats as dirty (needs recalculation)
+  private markPlayerStatsDirty(player: any): void {
+    if (player) {
+      const stats = this.playerStatsCache.get(player);
+      if (stats) {
+        stats.dirty = true;
+      }
+    }
   }
 
   getTotal(player: any): { army: number; land: number } {
-    let total = 0,
-      count = 0;
-    for (let i = 0; i < this.width; ++i) {
-      for (let j = 0; j < this.height; ++j) {
-        if (this.map[i][j].player === player) {
-          total += this.map[i][j].unit;
-          ++count;
+    let stats = this.playerStatsCache.get(player);
+
+    // Initialize if not in cache
+    if (!stats) {
+      stats = { army: 0, land: 0, dirty: true };
+      this.playerStatsCache.set(player, stats);
+    }
+
+    // Only recalculate if data is dirty
+    if (stats.dirty) {
+      let total = 0, count = 0;
+      for (let i = 0; i < this.width; ++i) {
+        for (let j = 0; j < this.height; ++j) {
+          if (this.map[i][j].player === player) {
+            total += this.map[i][j].unit;
+            ++count;
+          }
         }
       }
+      stats.army = total;
+      stats.land = count;
+      stats.dirty = false;
     }
-    return { army: total, land: count };
+
+    return { army: stats.army, land: stats.land };
   }
 
   getBlock(point: Point): Block {
@@ -336,11 +453,25 @@ class GameMap {
   }
 
   transferBlock(block: Block, player: any): void {
+    const oldPlayer = block.player;
+    // Mark both old and new players as dirty
+    this.markPlayerStatsDirty(oldPlayer);
+    this.markPlayerStatsDirty(player);
+
     this.map[block.x][block.y].player = player;
     if (block.type !== TileType.King) { // at this time, king have been dominated
       this.map[block.x][block.y].unit = Math.ceil(
         this.map[block.x][block.y].unit / 2
       );
+    }
+
+    // Update occupiedPlains set if this is a plain tile
+    if (block.type === TileType.Plain) {
+      if (player) {
+        this.occupiedPlains.add(block);
+      } else {
+        this.occupiedPlains.delete(block);
+      }
     }
   }
 
@@ -358,32 +489,42 @@ class GameMap {
   }
 
   updateUnit(): void {
-    for (let i = 0; i < this.width; i++) {
-      for (let j = 0; j < this.height; j++) {
-        switch (this.map[i][j].type) {
-          case TileType.Plain:
-            if (this.map[i][j].player && this.turn % 50 === 0)
-              ++this.map[i][j].unit;
-            break;
-          case TileType.King:
-            if (this.turn % 2 === 0) ++this.map[i][j].unit;
-            break;
-          case TileType.City:
-            if (this.map[i][j].player && this.turn % 2 === 0)
-              ++this.map[i][j].unit;
-            break;
-          case TileType.Swamp:
-            if (this.map[i][j].player && this.turn % 2 === 0)
-              --this.map[i][j].unit;
-            if (this.map[i][j].unit === 0) {
-              if (this.map[i][j].player) {
-                this.map[i][j].player.loseLand(this.map[i][j]);
-              }
-              this.map[i][j].player = null;
-            }
-            break;
-          default:
-            break;
+    // Mark all players as dirty since units are updating
+    for (const player of this.players) {
+      this.markPlayerStatsDirty(player);
+    }
+
+    // Update King tiles (every 2 turns)
+    if (this.turn % 2 === 0) {
+      for (const block of this.kingTiles) {
+        block.unit++;
+      }
+
+      // Update City tiles (every 2 turns, only if occupied)
+      for (const block of this.cityTiles) {
+        if (block.player) {
+          block.unit++;
+        }
+      }
+
+      // Update Swamp tiles (every 2 turns, decrease if occupied)
+      for (const block of this.swampTiles) {
+        if (block.player) {
+          block.unit--;
+          if (block.unit === 0) {
+            block.player.loseLand(block);
+            block.player = null;
+            this.occupiedPlains.delete(block);  // Remove from occupied plains
+          }
+        }
+      }
+    }
+
+    // Update Plain tiles (every 50 turns, only occupied)
+    if (this.turn % 50 === 0) {
+      for (const block of this.occupiedPlains) {
+        if (block.player) {  // Double check player is still there
+          block.unit++;
         }
       }
     }
@@ -412,17 +553,45 @@ class GameMap {
     this.getBlock(newFocus).enterUnit(player, unit);
   }
 
+  // Object pool helper: acquire a block from pool or create new one
+  private acquireBlock(
+    x: number,
+    y: number,
+    type: TileType,
+    unit: number = 0,
+    player: any = null,
+    isAlwaysRevealed: boolean = false
+  ): Block {
+    let block = this.blockPool.pop();
+    if (block) {
+      block.reset(x, y, type, unit, player, isAlwaysRevealed, 0, true);
+      return block;
+    }
+    return new Block(x, y, type, unit, player, isAlwaysRevealed);
+  }
+
+  // Object pool helper: release blocks back to pool
+  private releaseBlocks(blocks: Block[][]): void {
+    for (let i = 0; i < blocks.length; i++) {
+      for (let j = 0; j < blocks[i].length; j++) {
+        if (blocks[i][j]) {
+          this.blockPool.push(blocks[i][j]);
+        }
+      }
+    }
+  }
+
   getViewPlayer(player: any): Promise<Block[][]> {
     // Get the view of the player from the whole map
     const viewOfPlayer: Block[][] = Array.from(Array(this.width), () =>
       Array(this.height).fill(null)
     );
 
-    // init
+    // init - use object pool to reduce GC pressure
     for (let i = 0; i < this.width; i++) {
       for (let j = 0; j < this.height; j++) {
         const origin = this.getBlock(new Point(i, j));
-        const block = new Block(
+        const block = this.acquireBlock(
           origin.x,
           origin.y,
           origin.type,
@@ -455,7 +624,7 @@ class GameMap {
         const point = new Point(i, j);
         const origin = this.getBlock(point);
         if (origin.player && origin.player.team === player.team) {
-          const block = new Block(
+          const block = this.acquireBlock(
             origin.x,
             origin.y,
             origin.type,
@@ -470,7 +639,7 @@ class GameMap {
             const newPoint = point.move(dir);
             if (this.withinMap(newPoint)) {
               const newOrigin = this.getBlock(newPoint);
-              const block = new Block(
+              const block = this.acquireBlock(
                 newOrigin.x,
                 newOrigin.y,
                 newOrigin.type,

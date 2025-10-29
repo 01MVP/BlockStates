@@ -16,6 +16,27 @@ class Block extends Point {
     super(x, y);
   }
 
+  // Reset method for object pool reuse
+  reset(
+    x: number,
+    y: number,
+    type: TileType,
+    unit: number = 0,
+    player: any = null,
+    isAlwaysRevealed: boolean = false,
+    priority: number = 0,
+    unitsCountRevealed: boolean = true
+  ): void {
+    this.x = x;
+    this.y = y;
+    this.type = type;
+    this.unit = unit;
+    this.player = player;
+    this.isAlwaysRevealed = isAlwaysRevealed;
+    this.priority = priority;
+    this.unitsCountRevealed = unitsCountRevealed;
+  }
+
   setUnit(unit: number): void {
     this.unit = unit;
   }
