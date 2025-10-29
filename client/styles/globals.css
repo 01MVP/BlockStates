@@ -379,3 +379,339 @@ a {
   text-transform: none;
   border-radius: 24px;
 }
+
+/* ==================== Block Empire Tailwind Components ==================== */
+/*
+ * 使用 @apply 将常用的 Tailwind 组合简化为语义化的类名
+ * 这些类可以在整个项目中复用，保持一致性
+ */
+
+@layer components {
+  /* ==================== 按钮组件 ==================== */
+
+  /* 主按钮 */
+  .btn-primary {
+    @apply px-8 py-3 text-sm font-normal border-2 border-text-primary
+           bg-text-secondary text-white rounded-md cursor-pointer
+           transition-all tracking-wide
+           hover:bg-text-primary hover:-translate-y-0.5 hover:shadow-lg
+           active:scale-95;
+  }
+
+  /* 次要按钮 */
+  .btn-secondary {
+    @apply px-8 py-3 text-sm font-normal border-2 border-text-muted
+           bg-bg-light text-text-primary rounded-md cursor-pointer
+           transition-all tracking-wide
+           hover:bg-bg-main hover:-translate-y-0.5 hover:shadow-lg
+           active:scale-95;
+  }
+
+  /* 小按钮 */
+  .btn-sm {
+    @apply px-4 py-2 text-xs font-normal border-2 border-text-muted
+           bg-bg-light text-text-primary rounded cursor-pointer
+           transition-all hover:bg-bg-main hover:-translate-y-0.5;
+  }
+
+  /* ==================== 卡片组件 ==================== */
+
+  /* 基础卡片 */
+  .card {
+    @apply bg-bg-light border-2 border-border-main rounded-lg
+           p-6 transition-all shadow-sm;
+  }
+
+  /* 可悬停卡片 */
+  .card-hover {
+    @apply card hover:-translate-y-1 hover:shadow-xl
+           hover:border-border-strong cursor-pointer;
+  }
+
+  /* 卡片标题 */
+  .card-title {
+    @apply text-text-primary text-lg font-normal
+           border-b-2 border-border-subtle pb-2 mb-3;
+  }
+
+  /* 卡片内容 */
+  .card-content {
+    @apply text-text-muted text-sm leading-relaxed;
+  }
+
+  /* ==================== 输入框组件 ==================== */
+
+  /* 基础输入框 */
+  .input {
+    @apply px-4 py-2.5 text-sm border-2 border-border-strong
+           bg-white text-text-primary rounded-md transition-all
+           outline-none min-w-[200px]
+           placeholder:text-text-placeholder
+           focus:border-text-muted focus:shadow-[0_0_0_3px_rgba(74,74,74,0.1)];
+  }
+
+  /* ==================== 导航组件 ==================== */
+
+  /* 导航项 */
+  .nav-item {
+    @apply text-text-muted no-underline text-sm transition-colors
+           hover:text-text-primary;
+  }
+
+  /* ==================== 游戏地图组件 ==================== */
+
+  /* 地图单元格 */
+  .map-cell {
+    @apply aspect-square border-[1.5px] border-border-strong
+           bg-bg-light rounded-sm flex items-center justify-center
+           text-xs text-white font-bold transition-all cursor-pointer
+           hover:scale-110 hover:z-10 hover:shadow-lg;
+  }
+
+  /* ==================== 玩家颜色类 ==================== */
+
+  .player-1 { @apply bg-player-1 border-player-1-dark; }
+  .player-2 { @apply bg-player-2 border-player-2-dark; }
+  .player-3 { @apply bg-player-3 border-player-3-dark; }
+  .player-4 { @apply bg-player-4 border-player-4-dark; }
+  .player-5 { @apply bg-player-5 border-player-5-dark; }
+  .player-6 { @apply bg-player-6 border-player-6-dark; }
+  .player-7 { @apply bg-player-7 border-player-7-dark; }
+  .player-8 { @apply bg-player-8 border-player-8-dark; }
+
+  /* 玩家指示器（小方块） */
+  .player-indicator {
+    @apply w-8 h-8 rounded border-2 border-border-main;
+  }
+
+  /* ==================== 地形类 ==================== */
+
+  .terrain-mountain { @apply bg-terrain-mountain border-terrain-mountain-dark; }
+  .terrain-swamp { @apply bg-terrain-swamp border-terrain-swamp-dark; }
+
+  /* ==================== 布局组件 ==================== */
+
+  /* 区块（section） */
+  .section {
+    @apply bg-white rounded-lg p-10 mb-10 shadow-md border border-border-subtle;
+  }
+
+  /* 区块标题 */
+  .section-title {
+    @apply text-text-primary text-2xl mb-8 font-light
+           border-b-2 border-border-subtle pb-2.5;
+  }
+
+  /* 注释框 */
+  .note {
+    @apply bg-[#f9f9f9] border-l-4 border-text-secondary p-4 my-5 rounded;
+  }
+
+  /* ==================== 游戏特定组件 ==================== */
+
+  /* 玩家标签/按钮 */
+  .player-tag {
+    @apply inline-flex items-center gap-1 px-3 py-1.5
+           border-2 rounded-full text-sm font-medium
+           transition-all shadow-sm
+           hover:-translate-y-0.5 hover:shadow-md;
+  }
+
+  /* 排行榜行 */
+  .leaderboard-row {
+    @apply flex items-center justify-between px-4 py-3
+           border-b border-border-subtle transition-colors
+           hover:bg-bg-light;
+  }
+
+  /* 排行榜表头 */
+  .leaderboard-header {
+    @apply flex items-center justify-between px-4 py-2
+           bg-bg-main border-b-2 border-border-main
+           text-sm font-medium text-text-muted;
+  }
+
+  /* 回合计数器 */
+  .turn-counter {
+    @apply inline-flex items-center gap-2 px-4 py-2
+           bg-text-primary/90 backdrop-blur-sm
+           text-white rounded-lg text-sm font-medium
+           shadow-md;
+  }
+
+  /* 游戏状态标签 */
+  .game-status {
+    @apply inline-block px-3 py-1 text-xs font-medium
+           rounded-full border-2;
+  }
+
+  .game-status.waiting {
+    @apply bg-yellow-50 border-yellow-400 text-yellow-700;
+  }
+
+  .game-status.playing {
+    @apply bg-green-50 border-green-400 text-green-700;
+  }
+
+  .game-status.ended {
+    @apply bg-gray-50 border-gray-400 text-gray-700;
+  }
+
+  /* 房间卡片 */
+  .room-card {
+    @apply card-hover relative overflow-hidden;
+  }
+
+  .room-card-badge {
+    @apply absolute top-3 right-3 px-2 py-1
+           bg-text-primary text-white text-xs
+           rounded font-medium;
+  }
+
+  /* 统计数字显示 */
+  .stat-number {
+    @apply text-2xl font-bold text-text-primary;
+  }
+
+  .stat-label {
+    @apply text-xs text-text-muted uppercase tracking-wide;
+  }
+
+  /* 图标按钮 */
+  .icon-btn {
+    @apply p-2 rounded-lg border-2 border-border-main
+           bg-bg-light transition-all
+           hover:bg-bg-main hover:border-border-strong hover:scale-105;
+  }
+
+  /* Badge/徽章 */
+  .badge {
+    @apply inline-flex items-center px-2 py-1
+           text-xs font-medium rounded
+           bg-text-primary text-white;
+  }
+
+  .badge.primary {
+    @apply bg-text-primary text-white;
+  }
+
+  .badge.success {
+    @apply bg-green-500 text-white;
+  }
+
+  .badge.warning {
+    @apply bg-yellow-500 text-white;
+  }
+
+  .badge.danger {
+    @apply bg-red-500 text-white;
+  }
+
+  /* 聊天消息 */
+  .chat-message {
+    @apply px-3 py-2 text-sm leading-relaxed
+           hover:bg-white/5 transition-colors;
+  }
+
+  .chat-username {
+    @apply font-medium;
+  }
+
+  /* 玩家信息卡片 */
+  .player-info-card {
+    @apply flex items-center gap-3 p-3
+           bg-bg-light border-2 border-border-main
+           rounded-lg transition-all
+           hover:border-border-strong;
+  }
+
+  .player-avatar {
+    @apply w-10 h-10 rounded-full border-2
+           flex items-center justify-center
+           font-bold text-white;
+  }
+
+  /* 进度条 */
+  .progress-bar {
+    @apply w-full h-2 bg-bg-main rounded-full overflow-hidden;
+  }
+
+  .progress-fill {
+    @apply h-full bg-text-primary transition-all duration-300;
+  }
+
+  /* 对话框 */
+  .dialog-overlay {
+    @apply fixed inset-0 bg-black/50 backdrop-blur-sm
+           flex items-center justify-center z-50;
+  }
+
+  .dialog-content {
+    @apply bg-white rounded-lg p-6 max-w-md w-full
+           border-2 border-border-main shadow-xl;
+  }
+
+  .dialog-title {
+    @apply text-xl font-medium text-text-primary mb-4;
+  }
+
+  .dialog-actions {
+    @apply flex gap-3 justify-end mt-6;
+  }
+
+  /* 加载动画容器 */
+  .loading-container {
+    @apply flex flex-col items-center justify-center
+           gap-4 py-8;
+  }
+
+  .loading-spinner {
+    @apply w-8 h-8 border-4 border-border-main
+           border-t-text-primary rounded-full
+           animate-spin;
+  }
+
+  /* 工具提示 */
+  .tooltip {
+    @apply absolute px-2 py-1 text-xs
+           bg-text-primary text-white rounded
+           whitespace-nowrap pointer-events-none
+           opacity-0 transition-opacity;
+  }
+
+  /* 分隔线 */
+  .divider {
+    @apply w-full h-px bg-border-subtle my-4;
+  }
+
+  .divider-vertical {
+    @apply w-px h-full bg-border-subtle mx-4;
+  }
+
+  /* 面板容器 */
+  .panel {
+    @apply bg-text-primary/90 backdrop-blur-sm
+           rounded-lg p-4 shadow-lg;
+  }
+
+  .panel-dark {
+    @apply panel text-white;
+  }
+
+  /* 网格容器 - 用于房间列表等 */
+  .grid-container {
+    @apply grid gap-6;
+  }
+
+  .grid-2 {
+    @apply grid-container grid-cols-1 md:grid-cols-2;
+  }
+
+  .grid-3 {
+    @apply grid-container grid-cols-1 md:grid-cols-2 lg:grid-cols-3;
+  }
+
+  .grid-4 {
+    @apply grid-container grid-cols-2 md:grid-cols-3 lg:grid-cols-4;
+  }
+}

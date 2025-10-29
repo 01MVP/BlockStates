@@ -240,7 +240,10 @@ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 ## 🔗 相关资源
 
 - **完整设计展示**：`ui-design-system.html` - Tailwind CSS 可交互的完整设计系统
+- **简化版设计展示**：`ui-design-system-simplified.html` - 使用简化组件类的示例（基础组件）
+- **游戏组件展示**：`ui-game-components.html` - 游戏特定组件演示（推荐查看）⭐
 - **Tailwind 配置**：`tailwind.config.js` - 项目的 Tailwind 配置文件（包含所有设计 tokens）
+- **组件类定义**：`client/styles/globals.css` - 自定义的简化组件类（btn-primary、card 等）
 - **CSS 变量（旧）**：`design-tokens.css` - 可直接导入的 CSS 变量（保留兼容性）
 - **Logo**：`logo.svg` - 官方 Logo（圆角柔和版）
 
@@ -248,17 +251,19 @@ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 
 如果你正在从 MUI 或 CSS 变量迁移到 Tailwind，可以参考：
 
-| 原 CSS 变量 | Tailwind Class | 说明 |
-|-----------|---------------|------|
-| `var(--bg-light)` | `bg-bg-light` | 浅背景色 |
-| `var(--player-1)` | `bg-player-1` | 玩家 1 颜色 |
-| `var(--player-1-dark)` | `border-player-1-dark` | 玩家 1 边框色 |
-| `var(--text-primary)` | `text-text-primary` | 主文字色 |
-| `var(--radius-md)` | `rounded-md` | 6px 圆角 |
-| `var(--shadow-lg)` | `shadow-lg` | 大阴影 |
-| `var(--spacing-lg)` | `p-lg` / `m-lg` | 20px 间距 |
+| 原来的写法 | 简化的组件类 | 原生 Tailwind | 说明 |
+|-----------|------------|---------------|------|
+| `<Button variant="contained">` | `btn-primary` | `px-8 py-3 bg-text-secondary text-white...` | 主按钮 |
+| `<Card>` | `card` 或 `card-hover` | `bg-bg-light border-2...` | 卡片 |
+| `<TextField>` | `input` | `px-4 py-2.5 border-2...` | 输入框 |
+| `var(--player-1)` | `player-1` | `bg-player-1 border-player-1-dark` | 玩家颜色 |
+| 自定义样式 | - | 原生 Tailwind 类 | 灵活定制 |
 
-查看完整对照表：打开 `ui-design-system.html` 查看所有组件的 Tailwind 实现。
+**推荐路径**：
+1. 查看 `ui-design-system-simplified.html` 了解简化效果
+2. 在新组件中使用简化类（如 `btn-primary`）
+3. 需要定制时组合使用原生 Tailwind 类
+4. 逐步迁移旧组件
 
 ---
 
@@ -295,6 +300,67 @@ module.exports = {
 
 #### 3. Tailwind 使用示例
 
+##### 方式A：使用简化的组件类（推荐）⭐
+
+我们已经在 `client/styles/globals.css` 中定义了常用的组件类，可以大大简化代码：
+
+**创建按钮**
+```jsx
+{/* 主按钮 */}
+<button className="btn-primary">开始游戏</button>
+
+{/* 次要按钮 */}
+<button className="btn-secondary">加入房间</button>
+
+{/* 可以组合使用 */}
+<button className="btn-primary text-lg">大按钮</button>
+```
+
+**创建卡片**
+```jsx
+<div className="card-hover">
+  <h3 className="card-title">8人混战</h3>
+  <p className="text-text-muted text-sm">经典多人对战...</p>
+</div>
+```
+
+**输入框**
+```jsx
+<input className="input" placeholder="玩家昵称..." />
+```
+
+**地图单元格**
+```jsx
+<div className="map-cell player-1 king"></div>
+<div className="map-cell mountain"></div>
+```
+
+**基础组件类列表**：
+- 按钮：`.btn-primary`, `.btn-secondary`, `.btn-sm`, `.icon-btn`
+- 卡片：`.card`, `.card-hover`, `.card-title`
+- 输入框：`.input`
+- 地图：`.map-cell`
+- 玩家颜色：`.player-1` ~ `.player-8`
+- 地形：`.terrain-mountain`, `.terrain-swamp`
+- 布局：`.section`, `.section-title`
+
+**游戏特定组件类**：
+- 玩家相关：`.player-tag`, `.player-info-card`, `.player-avatar`
+- 排行榜：`.leaderboard-row`, `.leaderboard-header`
+- 游戏状态：`.game-status`, `.turn-counter`, `.stat-number`, `.stat-label`
+- 房间/卡片：`.room-card`, `.room-card-badge`
+- UI 元素：`.badge`, `.loading-spinner`
+- 对话框：`.dialog-overlay`, `.dialog-content`, `.dialog-title`, `.dialog-actions`
+- 布局网格：`.grid-2`, `.grid-3`, `.grid-4`
+
+查看完整列表和效果：
+- 基础组件：打开 `ui-design-system-simplified.html`
+- 游戏组件：打开 `ui-game-components.html` ⭐
+
+##### 方式B：使用原生 Tailwind 类
+
+如果需要更灵活的定制，可以直接使用 Tailwind 原生类：
+
 **创建玩家颜色方块**
 ```jsx
 <div className="bg-player-1 border-2 border-player-1-dark rounded-md p-4">
@@ -304,30 +370,12 @@ module.exports = {
 
 **创建按钮**
 ```jsx
-{/* 主按钮 */}
 <button className="px-8 py-3 border-2 border-text-primary
                    bg-text-secondary text-white rounded-md
                    hover:bg-text-primary hover:-translate-y-0.5
                    transition-all">
   开始游戏
 </button>
-
-{/* 次要按钮 */}
-<button className="px-8 py-3 border-2 border-text-muted
-                   bg-bg-light text-text-primary rounded-md
-                   hover:bg-bg-main hover:-translate-y-0.5
-                   transition-all">
-  加入房间
-</button>
-```
-
-**地图单元格**
-```jsx
-<div className="aspect-square border-[1.5px] border-border-strong
-                bg-player-1 rounded-sm flex items-center justify-center
-                hover:scale-110 hover:shadow-lg transition-all cursor-pointer">
-  ♔
-</div>
 ```
 
 **动态玩家颜色**
@@ -335,7 +383,7 @@ module.exports = {
 const playerColors = ['player-1', 'player-2', 'player-3', /* ... */];
 
 <div className={`bg-${playerColors[playerId]} border-2 border-${playerColors[playerId]}-dark`}>
-  {/* 或使用模板字符串 */}
+  {/* 或使用 style 属性 */}
   <div style={{ backgroundColor: `#E74C3C` }} className="border-2 rounded-md">
     动态颜色方案
   </div>
@@ -348,6 +396,11 @@ const playerColors = ['player-1', 'player-2', 'player-3', /* ... */];
   {/* 手机端 8 列，PC 端 12 列 */}
 </div>
 ```
+
+**最佳实践**：
+- ✅ 常用组件优先使用简化类（如 `btn-primary`）
+- ✅ 特殊场景使用原生 Tailwind 类进行微调
+- ✅ 两种方式可以混用：`className="btn-primary text-lg ml-4"`
 
 ### 方式二：使用 CSS 变量（旧方式，保留兼容）
 

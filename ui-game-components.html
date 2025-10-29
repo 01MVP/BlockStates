@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Block Empire - 游戏 UI 组件库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'bg-light': '#FAFAFA', 'bg-main': '#F0F0F0',
+                        'border-subtle': '#E0E0E0', 'border-main': '#D0D0D0', 'border-strong': '#B0B0B0',
+                        'text-primary': '#2A2A2A', 'text-secondary': '#3A3A3A', 'text-muted': '#5A5A5A',
+                        player: {
+                            1: '#E74C3C', '1-dark': '#C0392B', 2: '#3498DB', '2-dark': '#2980B9',
+                            3: '#2ECC71', '3-dark': '#27AE60', 4: '#F39C12', '4-dark': '#E67E22',
+                        },
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn-primary { @apply px-8 py-3 text-sm border-2 border-text-primary bg-text-secondary text-white rounded-md transition-all hover:bg-text-primary hover:-translate-y-0.5 hover:shadow-lg; }
+            .btn-secondary { @apply px-8 py-3 text-sm border-2 border-text-muted bg-bg-light text-text-primary rounded-md transition-all hover:bg-bg-main hover:-translate-y-0.5 hover:shadow-lg; }
+            .card { @apply bg-bg-light border-2 border-border-main rounded-lg p-6 shadow-sm; }
+            .card-hover { @apply card transition-all hover:-translate-y-1 hover:shadow-xl hover:border-border-strong cursor-pointer; }
+            .card-title { @apply text-text-primary text-lg font-normal border-b-2 border-border-subtle pb-2 mb-3; }
+            .section { @apply bg-white rounded-lg p-10 mb-10 shadow-md border border-border-subtle; }
+            .section-title { @apply text-text-primary text-2xl mb-8 font-light border-b-2 border-border-subtle pb-2.5; }
+
+            /* 游戏特定组件 */
+            .player-tag { @apply inline-flex items-center gap-1 px-3 py-1.5 border-2 rounded-full text-sm font-medium transition-all shadow-sm hover:-translate-y-0.5 hover:shadow-md; }
+            .player-1 { @apply bg-player-1 border-player-1-dark; }
+            .player-2 { @apply bg-player-2 border-player-2-dark; }
+            .player-3 { @apply bg-player-3 border-player-3-dark; }
+            .player-4 { @apply bg-player-4 border-player-4-dark; }
+            .leaderboard-row { @apply flex items-center justify-between px-4 py-3 border-b border-border-subtle transition-colors hover:bg-bg-light; }
+            .leaderboard-header { @apply flex items-center justify-between px-4 py-2 bg-bg-main border-b-2 border-border-main text-sm font-medium text-text-muted; }
+            .turn-counter { @apply inline-flex items-center gap-2 px-4 py-2 bg-text-primary/90 backdrop-blur-sm text-white rounded-lg text-sm font-medium shadow-md; }
+            .game-status { @apply inline-block px-3 py-1 text-xs font-medium rounded-full border-2; }
+            .game-status.waiting { @apply bg-yellow-50 border-yellow-400 text-yellow-700; }
+            .game-status.playing { @apply bg-green-50 border-green-400 text-green-700; }
+            .game-status.ended { @apply bg-gray-50 border-gray-400 text-gray-700; }
+            .room-card { @apply card-hover relative overflow-hidden; }
+            .room-card-badge { @apply absolute top-3 right-3 px-2 py-1 bg-text-primary text-white text-xs rounded font-medium; }
+            .stat-number { @apply text-2xl font-bold text-text-primary; }
+            .stat-label { @apply text-xs text-text-muted uppercase tracking-wide; }
+            .icon-btn { @apply p-2 rounded-lg border-2 border-border-main bg-bg-light transition-all hover:bg-bg-main hover:border-border-strong hover:scale-105; }
+            .badge { @apply inline-flex items-center px-2 py-1 text-xs font-medium rounded; }
+            .badge.primary { @apply bg-text-primary text-white; }
+            .badge.success { @apply bg-green-500 text-white; }
+            .badge.warning { @apply bg-yellow-500 text-white; }
+            .badge.danger { @apply bg-red-500 text-white; }
+            .player-info-card { @apply flex items-center gap-3 p-3 bg-bg-light border-2 border-border-main rounded-lg transition-all hover:border-border-strong; }
+            .player-avatar { @apply w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold text-white; }
+            .dialog-overlay { @apply fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50; }
+            .dialog-content { @apply bg-white rounded-lg p-6 max-w-md w-full border-2 border-border-main shadow-xl; }
+            .dialog-title { @apply text-xl font-medium text-text-primary mb-4; }
+            .loading-spinner { @apply w-8 h-8 border-4 border-border-main border-t-text-primary rounded-full animate-spin; }
+            .grid-3 { @apply grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3; }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-[#f5f5f5] to-[#e8e8e8] p-5">
+    <div class="max-w-[1400px] mx-auto">
+        <h1 class="text-center text-3xl font-light tracking-[3px] text-text-primary mb-3">🎮 游戏 UI 组件库</h1>
+        <p class="text-center text-lg text-text-muted font-light mb-10">Block Empire 专用游戏组件</p>
+
+        <!-- 玩家标签 -->
+        <section class="section">
+            <h2 class="section-title">玩家标签 Player Tags</h2>
+            <div class="flex gap-3 flex-wrap mb-6">
+                <button class="player-tag player-1 text-white">
+                    <span>⭐</span>
+                    <span>玩家A (房主)</span>
+                </button>
+                <button class="player-tag player-2 text-white">玩家B</button>
+                <button class="player-tag player-3 text-white">玩家C</button>
+                <button class="player-tag player-4 text-white">玩家D</button>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;button className="player-tag player-1 text-white"&gt;
+  &lt;span&gt;⭐&lt;/span&gt;
+  &lt;span&gt;玩家A (房主)&lt;/span&gt;
+&lt;/button&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 排行榜 -->
+        <section class="section">
+            <h2 class="section-title">排行榜 Leaderboard</h2>
+            <div class="bg-white border-2 border-border-main rounded-lg overflow-hidden mb-6">
+                <div class="leaderboard-header">
+                    <span>玩家</span>
+                    <span>军队数</span>
+                    <span>领地数</span>
+                </div>
+                <div class="leaderboard-row">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded bg-player-1"></div>
+                        <span>玩家A</span>
+                    </div>
+                    <span class="font-bold">245</span>
+                    <span class="font-bold">42</span>
+                </div>
+                <div class="leaderboard-row">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded bg-player-2"></div>
+                        <span>玩家B</span>
+                    </div>
+                    <span class="font-bold">198</span>
+                    <span class="font-bold">38</span>
+                </div>
+                <div class="leaderboard-row">
+                    <div class="flex items-center gap-2">
+                        <div class="w-6 h-6 rounded bg-player-3"></div>
+                        <span>玩家C</span>
+                    </div>
+                    <span class="font-bold">156</span>
+                    <span class="font-bold">31</span>
+                </div>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;div className="leaderboard-header"&gt;
+  &lt;span&gt;玩家&lt;/span&gt;
+  &lt;span&gt;军队数&lt;/span&gt;
+  &lt;span&gt;领地数&lt;/span&gt;
+&lt;/div&gt;
+&lt;div className="leaderboard-row"&gt;
+  &lt;!-- 内容 --&gt;
+&lt;/div&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 游戏状态标签 -->
+        <section class="section">
+            <h2 class="section-title">游戏状态 Game Status</h2>
+            <div class="flex gap-4 flex-wrap mb-6">
+                <span class="game-status waiting">等待中</span>
+                <span class="game-status playing">游戏中</span>
+                <span class="game-status ended">已结束</span>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;span className="game-status waiting"&gt;等待中&lt;/span&gt;
+&lt;span className="game-status playing"&gt;游戏中&lt;/span&gt;
+&lt;span className="game-status ended"&gt;已结束&lt;/span&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 回合计数器 -->
+        <section class="section">
+            <h2 class="section-title">回合计数器 Turn Counter</h2>
+            <div class="mb-6">
+                <div class="turn-counter">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"/>
+                    </svg>
+                    <span>回合: 147</span>
+                </div>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;div className="turn-counter"&gt;
+  &lt;svg&gt;...&lt;/svg&gt;
+  &lt;span&gt;回合: 147&lt;/span&gt;
+&lt;/div&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 房间卡片 -->
+        <section class="section">
+            <h2 class="section-title">房间卡片 Room Cards</h2>
+            <div class="grid-3 mb-6">
+                <div class="room-card">
+                    <div class="room-card-badge">4/8</div>
+                    <h3 class="card-title">8人混战</h3>
+                    <p class="text-text-muted text-sm mb-4">经典多人对战模式</p>
+                    <div class="flex items-center justify-between">
+                        <span class="game-status playing">游戏中</span>
+                        <div class="flex gap-1">
+                            <div class="w-6 h-6 rounded bg-player-1"></div>
+                            <div class="w-6 h-6 rounded bg-player-2"></div>
+                            <div class="w-6 h-6 rounded bg-player-3"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="room-card">
+                    <div class="room-card-badge">2/4</div>
+                    <h3 class="card-title">4人对抗</h3>
+                    <p class="text-text-muted text-sm mb-4">中等规模快节奏</p>
+                    <div class="flex items-center justify-between">
+                        <span class="game-status waiting">等待中</span>
+                        <div class="flex gap-1">
+                            <div class="w-6 h-6 rounded bg-player-1"></div>
+                            <div class="w-6 h-6 rounded bg-player-2"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="room-card">
+                    <div class="room-card-badge">0/2</div>
+                    <h3 class="card-title">1v1 决斗</h3>
+                    <p class="text-text-muted text-sm mb-4">竞技对决模式</p>
+                    <div class="flex items-center justify-between">
+                        <span class="game-status waiting">等待中</span>
+                        <div class="text-text-muted text-sm">空房间</div>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;div className="room-card"&gt;
+  &lt;div className="room-card-badge"&gt;4/8&lt;/div&gt;
+  &lt;h3 className="card-title"&gt;8人混战&lt;/h3&gt;
+  &lt;p className="text-text-muted text-sm mb-4"&gt;...&lt;/p&gt;
+  &lt;span className="game-status playing"&gt;游戏中&lt;/span&gt;
+&lt;/div&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 统计数字 -->
+        <section class="section">
+            <h2 class="section-title">统计数字 Stats</h2>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-6">
+                <div class="card text-center">
+                    <div class="stat-number">245</div>
+                    <div class="stat-label">军队数</div>
+                </div>
+                <div class="card text-center">
+                    <div class="stat-number">42</div>
+                    <div class="stat-label">领地数</div>
+                </div>
+                <div class="card text-center">
+                    <div class="stat-number">1,250</div>
+                    <div class="stat-label">总分数</div>
+                </div>
+                <div class="card text-center">
+                    <div class="stat-number">#3</div>
+                    <div class="stat-label">排名</div>
+                </div>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;div className="card text-center"&gt;
+  &lt;div className="stat-number"&gt;245&lt;/div&gt;
+  &lt;div className="stat-label"&gt;军队数&lt;/div&gt;
+&lt;/div&gt;</pre>
+            </div>
+        </section>
+
+        <!-- Badges -->
+        <section class="section">
+            <h2 class="section-title">徽章 Badges</h2>
+            <div class="flex gap-3 flex-wrap mb-6">
+                <span class="badge primary">在线</span>
+                <span class="badge success">胜利</span>
+                <span class="badge warning">等待</span>
+                <span class="badge danger">投降</span>
+                <span class="badge" style="background: #E74C3C;">8人</span>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;span className="badge primary"&gt;在线&lt;/span&gt;
+&lt;span className="badge success"&gt;胜利&lt;/span&gt;
+&lt;span className="badge warning"&gt;等待&lt;/span&gt;
+&lt;span className="badge danger"&gt;投降&lt;/span&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 图标按钮 -->
+        <section class="section">
+            <h2 class="section-title">图标按钮 Icon Buttons</h2>
+            <div class="flex gap-3 mb-6">
+                <button class="icon-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    </svg>
+                </button>
+                <button class="icon-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                    </svg>
+                </button>
+                <button class="icon-btn">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;button className="icon-btn"&gt;
+  &lt;svg&gt;...&lt;/svg&gt;
+&lt;/button&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 玩家信息卡片 -->
+        <section class="section">
+            <h2 class="section-title">玩家信息卡片 Player Info Cards</h2>
+            <div class="space-y-3 mb-6">
+                <div class="player-info-card">
+                    <div class="player-avatar player-1">A</div>
+                    <div class="flex-1">
+                        <div class="font-medium text-text-primary">玩家A</div>
+                        <div class="text-sm text-text-muted">军队: 245 | 领地: 42</div>
+                    </div>
+                    <span class="badge success">在线</span>
+                </div>
+                <div class="player-info-card">
+                    <div class="player-avatar player-2">B</div>
+                    <div class="flex-1">
+                        <div class="font-medium text-text-primary">玩家B</div>
+                        <div class="text-sm text-text-muted">军队: 198 | 领地: 38</div>
+                    </div>
+                    <span class="badge success">在线</span>
+                </div>
+                <div class="player-info-card">
+                    <div class="player-avatar player-3">C</div>
+                    <div class="flex-1">
+                        <div class="font-medium text-text-primary">玩家C</div>
+                        <div class="text-sm text-text-muted">军队: 156 | 领地: 31</div>
+                    </div>
+                    <span class="badge danger">投降</span>
+                </div>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;div className="player-info-card"&gt;
+  &lt;div className="player-avatar player-1"&gt;A&lt;/div&gt;
+  &lt;div className="flex-1"&gt;
+    &lt;div className="font-medium"&gt;玩家A&lt;/div&gt;
+    &lt;div className="text-sm text-text-muted"&gt;...&lt;/div&gt;
+  &lt;/div&gt;
+  &lt;span className="badge success"&gt;在线&lt;/span&gt;
+&lt;/div&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 加载动画 -->
+        <section class="section">
+            <h2 class="section-title">加载动画 Loading</h2>
+            <div class="flex justify-center mb-6">
+                <div class="loading-spinner"></div>
+            </div>
+            <div class="bg-text-primary text-white p-4 rounded text-xs overflow-x-auto">
+<pre>&lt;div className="loading-spinner"&gt;&lt;/div&gt;</pre>
+            </div>
+        </section>
+
+        <!-- 完整类名列表 -->
+        <section class="section">
+            <h2 class="section-title">完整游戏组件类名列表</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div>
+                    <h3 class="text-text-secondary text-lg mb-3 font-medium">玩家相关</h3>
+                    <ul class="space-y-1 text-sm text-text-muted font-mono">
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.player-tag</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.player-1 ~ .player-8</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.player-info-card</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.player-avatar</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-text-secondary text-lg mb-3 font-medium">排行榜</h3>
+                    <ul class="space-y-1 text-sm text-text-muted font-mono">
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.leaderboard-row</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.leaderboard-header</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-text-secondary text-lg mb-3 font-medium">游戏状态</h3>
+                    <ul class="space-y-1 text-sm text-text-muted font-mono">
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.game-status</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.turn-counter</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.stat-number</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.stat-label</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-text-secondary text-lg mb-3 font-medium">房间/卡片</h3>
+                    <ul class="space-y-1 text-sm text-text-muted font-mono">
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.room-card</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.room-card-badge</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-text-secondary text-lg mb-3 font-medium">UI 元素</h3>
+                    <ul class="space-y-1 text-sm text-text-muted font-mono">
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.badge</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.icon-btn</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.loading-spinner</code></li>
+                    </ul>
+                </div>
+
+                <div>
+                    <h3 class="text-text-secondary text-lg mb-3 font-medium">布局</h3>
+                    <ul class="space-y-1 text-sm text-text-muted font-mono">
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.grid-2, .grid-3, .grid-4</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.dialog-overlay</code></li>
+                        <li><code class="bg-bg-main px-2 py-0.5 rounded">.dialog-content</code></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>
