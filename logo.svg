@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- 清晰版5: 圆角柔和版 -->
+  <defs>
+    <linearGradient id="grayBg5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f7f7f7;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#ebebeb;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <rect width="200" height="200" fill="url(#grayBg5)"/>
+
+  <g transform="translate(100, 100)">
+    <!-- 圆角方块 -->
+    <rect x="-50" y="-50" width="100" height="100" rx="4"
+          fill="none" stroke="#2a2a2a" stroke-width="2.5"/>
+
+    <!-- 网格 -->
+    <line x1="-50" y1="-17" x2="50" y2="-17" stroke="#4a4a4a" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="-50" y1="17" x2="50" y2="17" stroke="#4a4a4a" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="-17" y1="-50" x2="-17" y2="50" stroke="#4a4a4a" stroke-width="1.5" stroke-linecap="round"/>
+    <line x1="17" y1="-50" x2="17" y2="50" stroke="#4a4a4a" stroke-width="1.5" stroke-linecap="round"/>
+
+    <!-- 王冠 -->
+    <path d="M -20,-35 L -15,-42 L -10,-35 L -5,-40 L 0,-35 L 5,-40 L 10,-35 L 15,-42 L 20,-35"
+          fill="none" stroke="#2a2a2a" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <line x1="-20" y1="-35" x2="20" y2="-35" stroke="#2a2a2a" stroke-width="2" stroke-linecap="round"/>
+
+    <!-- 中心 -->
+    <circle cx="0" cy="0" r="8" fill="none" stroke="#2a2a2a" stroke-width="2"/>
+    <circle cx="0" cy="0" r="4" fill="#3a3a3a"/>
+  </g>
+
+  <text x="100" y="175" font-family="Arial, sans-serif" font-size="13" font-weight="300"
+        text-anchor="middle" fill="#3a3a3a" letter-spacing="1">BLOCK EMPIRE</text>
+</svg>

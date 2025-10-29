@@ -1,0 +1,344 @@
+/**
+ * Block Empire 设计系统 - CSS 变量
+ *
+ * 使用方法：
+ * 1. 在 HTML 中导入：<link rel="stylesheet" href="design-tokens.css">
+ * 2. 在 CSS 中导入：@import url('design-tokens.css');
+ * 3. 使用变量：background: var(--bg-main);
+ *
+ * 文档：参见 DESIGN.md
+ * 版本：v1.0
+ * 更新：2025-10-29
+ */
+
+:root {
+  /* ========== 主色调 - 灰度系统 ========== */
+
+  /* 背景色 */
+  --bg-light: #FAFAFA;          /* 浅背景 - 卡片、输入框 */
+  --bg-main: #F0F0F0;           /* 主背景 - 页面背景 */
+  --bg-white: #FFFFFF;          /* 纯白 - 导航栏、模态框 */
+
+  /* 边框和分割线 */
+  --border-subtle: #E0E0E0;     /* 细分割线 */
+  --border-main: #D0D0D0;       /* 主要边框 */
+  --border-strong: #B0B0B0;     /* 强调边框 */
+
+  /* 文字颜色 */
+  --text-primary: #2A2A2A;      /* 主要文字、线条 */
+  --text-secondary: #3A3A3A;    /* 次要标题 */
+  --text-muted: #5A5A5A;        /* 辅助文字 */
+  --text-placeholder: #8A8A8A;  /* 占位文字 */
+  --text-disabled: #9A9A9A;     /* 禁用状态 */
+
+  /* 阴影 */
+  --shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 6px 16px rgba(0, 0, 0, 0.12);
+
+  /* 渐变 */
+  --gradient-bg: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  --gradient-card: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+  --gradient-btn: linear-gradient(135deg, #f9f9f9 0%, #f0f0f0 100%);
+
+  /* ========== 玩家颜色系统（8 个玩家）========== */
+
+  /* 玩家 1 - 红色 */
+  --player-1: #E74C3C;
+  --player-1-dark: #C0392B;
+
+  /* 玩家 2 - 蓝色 */
+  --player-2: #3498DB;
+  --player-2-dark: #2980B9;
+
+  /* 玩家 3 - 绿色 */
+  --player-3: #2ECC71;
+  --player-3-dark: #27AE60;
+
+  /* 玩家 4 - 橙色 */
+  --player-4: #F39C12;
+  --player-4-dark: #E67E22;
+
+  /* 玩家 5 - 紫色 */
+  --player-5: #9B59B6;
+  --player-5-dark: #8E44AD;
+
+  /* 玩家 6 - 青色 */
+  --player-6: #1ABC9C;
+  --player-6-dark: #16A085;
+
+  /* 玩家 7 - 粉色 */
+  --player-7: #E91E63;
+  --player-7-dark: #C2185B;
+
+  /* 玩家 8 - 深橙 */
+  --player-8: #FF5722;
+  --player-8-dark: #E64A19;
+
+  /* ========== 地形颜色 ========== */
+
+  --terrain-mountain: #5A5A5A;
+  --terrain-mountain-dark: #3A3A3A;
+  --terrain-swamp: #7A7A7A;
+  --terrain-swamp-dark: #5A5A5A;
+  --terrain-obstacle: #4A4A4A;
+
+  /* ========== 间距系统 ========== */
+
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 20px;
+  --spacing-xl: 30px;
+  --spacing-2xl: 40px;
+
+  /* ========== 圆角系统 ========== */
+
+  --radius-sm: 4px;            /* 图标、小按钮 */
+  --radius-md: 6px;            /* 按钮、输入框 */
+  --radius-lg: 8px;            /* 卡片、导航栏 */
+
+  /* ========== 边框宽度 ========== */
+
+  --border-width-thin: 1px;
+  --border-width-normal: 1.5px;
+  --border-width-thick: 2px;
+  --border-width-bold: 2.5px;
+
+  /* ========== 字体系统 ========== */
+
+  --font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Arial', sans-serif;
+  --font-family-mono: 'Courier New', monospace;
+
+  --font-size-xs: 0.75em;      /* 12px */
+  --font-size-sm: 0.85em;      /* 13.6px */
+  --font-size-base: 1em;       /* 16px */
+  --font-size-lg: 1.1em;       /* 17.6px */
+  --font-size-xl: 1.3em;       /* 20.8px */
+  --font-size-2xl: 1.8em;      /* 28.8px */
+  --font-size-3xl: 2.5em;      /* 40px */
+
+  --font-weight-light: 300;
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-bold: 700;
+
+  /* ========== 过渡动画 ========== */
+
+  --transition-fast: 0.15s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+
+  /* ========== Z-index 层级 ========== */
+
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal: 100;
+  --z-tooltip: 200;
+}
+
+/* ========== 全局样式重置 ========== */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-family);
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text-primary);
+  background: var(--gradient-bg);
+}
+
+/* ========== 实用工具类 ========== */
+
+/* 按钮样式 */
+.btn-primary {
+  padding: 12px 30px;
+  font-size: 14px;
+  font-weight: var(--font-weight-normal);
+  border: var(--border-width-thick) solid var(--text-primary);
+  background: var(--text-secondary);
+  color: var(--bg-white);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  letter-spacing: 0.5px;
+}
+
+.btn-primary:hover {
+  background: var(--text-primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.btn-secondary {
+  padding: 12px 30px;
+  font-size: 14px;
+  font-weight: var(--font-weight-normal);
+  border: var(--border-width-thick) solid var(--text-muted);
+  background: var(--bg-light);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  letter-spacing: 0.5px;
+}
+
+.btn-secondary:hover {
+  background: var(--bg-main);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* 卡片样式 */
+.card {
+  background: var(--bg-light);
+  border: var(--border-width-thick) solid var(--border-main);
+  border-radius: var(--radius-lg);
+  padding: 25px;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+  border-color: var(--border-strong);
+}
+
+/* 输入框样式 */
+.input {
+  padding: 10px 15px;
+  font-size: 14px;
+  border: var(--border-width-thick) solid var(--border-strong);
+  background: var(--bg-white);
+  color: var(--text-primary);
+  border-radius: var(--radius-md);
+  transition: all var(--transition-base);
+  outline: none;
+  font-family: var(--font-family);
+}
+
+.input:focus {
+  border-color: var(--text-muted);
+  box-shadow: 0 0 0 3px rgba(74, 74, 74, 0.1);
+}
+
+.input::placeholder {
+  color: var(--text-placeholder);
+}
+
+/* 导航栏样式 */
+.nav {
+  background: var(--bg-white);
+  border-bottom: var(--border-width-thick) solid var(--border-main);
+  border-radius: var(--radius-lg);
+  padding: 15px 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-md);
+}
+
+.nav-logo {
+  font-size: 1.5em;
+  font-weight: var(--font-weight-light);
+  color: var(--text-primary);
+  letter-spacing: 2px;
+}
+
+.nav-item {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.95em;
+  transition: color var(--transition-base);
+  font-weight: var(--font-weight-normal);
+}
+
+.nav-item:hover {
+  color: var(--text-primary);
+}
+
+/* 地图单元格样式 */
+.map-cell {
+  aspect-ratio: 1;
+  border: var(--border-width-normal) solid var(--border-strong);
+  background: var(--bg-light);
+  transition: all var(--transition-fast);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.map-cell:hover {
+  transform: scale(1.15);
+  z-index: var(--z-dropdown);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+}
+
+/* 玩家颜色类 */
+.player-1 { background: var(--player-1); border-color: var(--player-1-dark); }
+.player-2 { background: var(--player-2); border-color: var(--player-2-dark); }
+.player-3 { background: var(--player-3); border-color: var(--player-3-dark); }
+.player-4 { background: var(--player-4); border-color: var(--player-4-dark); }
+.player-5 { background: var(--player-5); border-color: var(--player-5-dark); }
+.player-6 { background: var(--player-6); border-color: var(--player-6-dark); }
+.player-7 { background: var(--player-7); border-color: var(--player-7-dark); }
+.player-8 { background: var(--player-8); border-color: var(--player-8-dark); }
+
+/* 地形颜色类 */
+.terrain-mountain {
+  background: var(--terrain-mountain);
+  border-color: var(--terrain-mountain-dark);
+}
+
+.terrain-swamp {
+  background: var(--terrain-swamp);
+  border-color: var(--terrain-swamp-dark);
+}
+
+/* 文字工具类 */
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-center { text-align: center; }
+
+/* 间距工具类 */
+.m-sm { margin: var(--spacing-sm); }
+.m-md { margin: var(--spacing-md); }
+.m-lg { margin: var(--spacing-lg); }
+.p-sm { padding: var(--spacing-sm); }
+.p-md { padding: var(--spacing-md); }
+.p-lg { padding: var(--spacing-lg); }
+
+/* 阴影工具类 */
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-md { box-shadow: var(--shadow-md); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+
+/* 圆角工具类 */
+.rounded-sm { border-radius: var(--radius-sm); }
+.rounded-md { border-radius: var(--radius-md); }
+.rounded-lg { border-radius: var(--radius-lg); }
+
+/* ========== 响应式 ========== */
+
+@media (max-width: 768px) {
+  .nav {
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .btn-primary,
+  .btn-secondary {
+    width: 100%;
+  }
+}

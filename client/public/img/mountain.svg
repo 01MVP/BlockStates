@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <!-- 山脉图标 - 清晰黑色线条风格 -->
+  <defs>
+    <linearGradient id="mountainBg" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#f5f5f5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#e8e8e8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- 背景 -->
+  <rect width="64" height="64" fill="url(#mountainBg)" rx="4"/>
+
+  <!-- 山脉 -->
+  <g transform="translate(32, 32)">
+    <!-- 主峰 -->
+    <path d="M 0,-16 L 12,12 L -12,12 Z"
+          fill="none" stroke="#2a2a2a" stroke-width="2.5" stroke-linejoin="round"/>
+
+    <!-- 左峰 -->
+    <path d="M -16,0 L -8,12 L -20,12 Z"
+          fill="none" stroke="#3a3a3a" stroke-width="2" stroke-linejoin="round"/>
+
+    <!-- 右峰 -->
+    <path d="M 16,0 L 20,12 L 8,12 Z"
+          fill="none" stroke="#3a3a3a" stroke-width="2" stroke-linejoin="round"/>
+
+    <!-- 雪顶 -->
+    <path d="M 0,-16 L 4,-10 L -4,-10 Z"
+          fill="#5a5a5a" stroke="#2a2a2a" stroke-width="1"/>
+
+    <!-- 纹理线 -->
+    <line x1="-6" y1="-2" x2="-10" y2="6" stroke="#4a4a4a" stroke-width="1" opacity="0.6"/>
+    <line x1="6" y1="-2" x2="10" y2="6" stroke="#4a4a4a" stroke-width="1" opacity="0.6"/>
+  </g>
+</svg>
