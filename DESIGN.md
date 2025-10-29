@@ -239,27 +239,131 @@ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 
 ## 🔗 相关资源
 
-- **完整设计展示**：`ui-design-system.html` - 可交互的完整设计系统
-- **CSS 变量**：`design-tokens.css` - 可直接导入的 CSS 变量
+- **完整设计展示**：`ui-design-system.html` - Tailwind CSS 可交互的完整设计系统
+- **Tailwind 配置**：`tailwind.config.js` - 项目的 Tailwind 配置文件（包含所有设计 tokens）
+- **CSS 变量（旧）**：`design-tokens.css` - 可直接导入的 CSS 变量（保留兼容性）
 - **Logo**：`logo.svg` - 官方 Logo（圆角柔和版）
+
+### 迁移到 Tailwind CSS
+
+如果你正在从 MUI 或 CSS 变量迁移到 Tailwind，可以参考：
+
+| 原 CSS 变量 | Tailwind Class | 说明 |
+|-----------|---------------|------|
+| `var(--bg-light)` | `bg-bg-light` | 浅背景色 |
+| `var(--player-1)` | `bg-player-1` | 玩家 1 颜色 |
+| `var(--player-1-dark)` | `border-player-1-dark` | 玩家 1 边框色 |
+| `var(--text-primary)` | `text-text-primary` | 主文字色 |
+| `var(--radius-md)` | `rounded-md` | 6px 圆角 |
+| `var(--shadow-lg)` | `shadow-lg` | 大阴影 |
+| `var(--spacing-lg)` | `p-lg` / `m-lg` | 20px 间距 |
+
+查看完整对照表：打开 `ui-design-system.html` 查看所有组件的 Tailwind 实现。
 
 ---
 
 ## 💡 使用示例
 
-### 导入 CSS 变量
+### 方式一：使用 Tailwind CSS（推荐）
+
+#### 1. 安装 Tailwind
+```bash
+cd client/
+pnpm add -D tailwindcss postcss autoprefixer
+npx tailwindcss init -p
+```
+
+#### 2. 配置 tailwind.config.js
+```javascript
+// 已创建好的配置文件：/tailwind.config.js
+// 包含完整的设计 tokens：玩家颜色、间距、圆角、阴影等
+module.exports = {
+  content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      colors: {
+        'bg-light': '#FAFAFA',
+        player: {
+          1: { DEFAULT: '#E74C3C', dark: '#C0392B' },
+          // ... 其他玩家颜色
+        }
+      }
+    }
+  }
+}
+```
+
+#### 3. Tailwind 使用示例
+
+**创建玩家颜色方块**
+```jsx
+<div className="bg-player-1 border-2 border-player-1-dark rounded-md p-4">
+  玩家 1 的领地
+</div>
+```
+
+**创建按钮**
+```jsx
+{/* 主按钮 */}
+<button className="px-8 py-3 border-2 border-text-primary
+                   bg-text-secondary text-white rounded-md
+                   hover:bg-text-primary hover:-translate-y-0.5
+                   transition-all">
+  开始游戏
+</button>
+
+{/* 次要按钮 */}
+<button className="px-8 py-3 border-2 border-text-muted
+                   bg-bg-light text-text-primary rounded-md
+                   hover:bg-bg-main hover:-translate-y-0.5
+                   transition-all">
+  加入房间
+</button>
+```
+
+**地图单元格**
+```jsx
+<div className="aspect-square border-[1.5px] border-border-strong
+                bg-player-1 rounded-sm flex items-center justify-center
+                hover:scale-110 hover:shadow-lg transition-all cursor-pointer">
+  ♔
+</div>
+```
+
+**动态玩家颜色**
+```jsx
+const playerColors = ['player-1', 'player-2', 'player-3', /* ... */];
+
+<div className={`bg-${playerColors[playerId]} border-2 border-${playerColors[playerId]}-dark`}>
+  {/* 或使用模板字符串 */}
+  <div style={{ backgroundColor: `#E74C3C` }} className="border-2 rounded-md">
+    动态颜色方案
+  </div>
+</div>
+```
+
+**响应式设计**
+```jsx
+<div className="grid grid-cols-8 md:grid-cols-12 gap-1">
+  {/* 手机端 8 列，PC 端 12 列 */}
+</div>
+```
+
+### 方式二：使用 CSS 变量（旧方式，保留兼容）
+
+#### 导入 CSS 变量
 ```html
 <link rel="stylesheet" href="design-tokens.css">
 ```
 
-### 创建玩家颜色方块
+#### 创建玩家颜色方块
 ```html
 <div style="background: var(--player-1); border: 2px solid var(--player-1-dark);">
   玩家 1 的领地
 </div>
 ```
 
-### 创建按钮
+#### 创建按钮
 ```html
 <button class="btn-primary">开始游戏</button>
 <button class="btn-secondary">加入房间</button>
@@ -287,5 +391,18 @@ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 ---
 
 **最后更新**：2025-10-29
-**设计版本**：v1.0
+**设计版本**：v2.0（Tailwind CSS 版本）
 **Logo 版本**：`logo.svg` (block-empire-logo-clean-5)
+
+---
+
+## 📚 快速开始
+
+1. **查看设计系统**：在浏览器中打开 `ui-design-system.html` 查看完整设计
+2. **配置 Tailwind**：复制 `tailwind.config.js` 到你的项目
+3. **开始开发**：使用 Tailwind classes 如 `bg-player-1`、`text-text-primary` 等
+4. **参考文档**：查看上方的使用示例和组件规范
+
+如需帮助，请参考：
+- Tailwind 官方文档：https://tailwindcss.com/docs
+- 本项目设计规范：本文档
