@@ -15,7 +15,6 @@ import HomeIcon from '@mui/icons-material/Home';
 import UndoIcon from '@mui/icons-material/Undo';
 import { Box, IconButton, Tooltip, Typography } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTranslation } from 'next-i18next';
 import { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import MapTile from './MapTile';
 function GameMap() {
@@ -30,8 +29,6 @@ function GameMap() {
     initGameInfo,
     turnsCount,
   } = useGame();
-
-  const { t } = useTranslation();
 
   const isSmallScreen = useMediaQuery('(max-width:600px)');
 
@@ -413,22 +410,22 @@ function GameMap() {
             boxShadow: '2',
           }}
         >
-          <Tooltip title={t('howToPlay.centerGeneral')} placement='top'>
+          <Tooltip title="聚焦将军" placement='top'>
             <IconButton onClick={centerGeneral}>
               <HomeIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title={t('howToPlay.undoMove')} placement='top'>
+          <Tooltip title="撤销移动" placement='top'>
             <IconButton onClick={popQueue}>
               <UndoIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title={t('howToPlay.clearQueuedMoves')} placement='top'>
+          <Tooltip title="清除队列中的移动" placement='top'>
             <IconButton onClick={clearQueue}>
               <ClearIcon />
             </IconButton>
           </Tooltip>
-          <Tooltip title={t('howToPlay.toggle50')} placement='top'>
+          <Tooltip title="切换50%" placement='top'>
             <IconButton onClick={() => halfArmy(touchHalf)}>
               <Typography variant='body2'>50%</Typography>
             </IconButton>
@@ -447,7 +444,7 @@ function GameMap() {
           >
             <ZoomOutMap />
           </IconButton>
-          <Tooltip title={t('expandWSAD')} placement='top'>
+          <Tooltip title="展开WSAD" placement='top'>
             <IconButton onClick={toggleDirections}>
               {showDirections ? <ChevronLeftIcon /> : <ChevronRightIcon />}
             </IconButton>

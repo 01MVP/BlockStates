@@ -1,6 +1,5 @@
 import { Box, Button, Typography, Tooltip, Paper } from '@mui/material';
 import StarsRoundedIcon from '@mui/icons-material/StarsRounded';
-import { useTranslation } from 'next-i18next';
 
 import { Player } from '@/lib/types';
 import { ColorArr, MaxTeamNum, WarringStates } from '@/lib/constants';
@@ -21,7 +20,6 @@ function PlayerTable(props: PlayerTableProps) {
     disabled_ui,
     warringStatesMode,
   } = props;
-  const { t } = useTranslation();
 
   const teams = new Array(MaxTeamNum + 1);
   players.forEach((x) => {
@@ -60,7 +58,7 @@ function PlayerTable(props: PlayerTableProps) {
           {players.map((player: Player) => (
             <Tooltip
               key={player.id}
-              title={disabled_ui ? '' : t('transfer-host')}
+              title={disabled_ui ? '' : '转移房主'}
               placement='top'
               sx={{
                 display: 'flex',

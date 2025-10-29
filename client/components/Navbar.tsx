@@ -13,8 +13,7 @@ import Select from '@mui/material/Select';
 
 import { useState } from 'react';
 
-import { useTranslation } from 'next-i18next';
-import { useRouter } from 'next/router';
+import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import HowToPlay from './HowToPlay';
 
@@ -64,9 +63,15 @@ function Navbar() {
   };
 
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleClick = (lang: string) => async () => {
-    router.push(router.asPath, undefined, { locale: lang });
+    // Note: In App Router, locale switching needs to be implemented differently
+    // Typically using middleware or Link component with locale prefixes
+    // For now, using simple path-based navigation
+    // You may need to adjust this based on your i18n setup
+    const currentPath = pathname.replace(/^\/(en|zh)/, '');
+    router.push(`/${lang}${currentPath}`);
   };
 
   const handleOpenNavMenu = (event: any) => {
@@ -76,8 +81,6 @@ function Navbar() {
   const handleCloseNavMenu = () => {
     setAnchorElNav(null);
   };
-
-  const { t } = useTranslation();
 
   return (
     <AppBar position='fixed' className='navbar'>
@@ -127,7 +130,14 @@ function Navbar() {
             {navItems.map((item) => (
               <MenuItem key={item.href} onClick={handleCloseNavMenu}>
                 <Link href={item.href}>
-                  <Typography textAlign='center'>{t(item.label)}</Typography>
+                  <Typography textAlign='center'>
+                    {item.label === 'home' && '首页'}
+                    {item.label === 'wiki' && '文档'}
+                    {item.label === 'github' && 'GitHub'}
+                    {item.label === 'bot-api' && '开发机器人'}
+                    {item.label === 'feedback' && '反馈'}
+                    {item.label === 'qq-group' && 'QQ群'}
+                  </Typography>
                 </Link>
               </MenuItem>
             ))}
@@ -168,7 +178,12 @@ function Navbar() {
                   }}
                   startIcon={item.icon}
                 >
-                  {t(item.label)}
+                  {item.label === 'home' && '首页'}
+                  {item.label === 'wiki' && '文档'}
+                  {item.label === 'github' && 'GitHub'}
+                  {item.label === 'bot-api' && '开发机器人'}
+                  {item.label === 'feedback' && '反馈'}
+                  {item.label === 'qq-group' && 'QQ群'}
                 </Button>
               </Link>
             ))}
@@ -188,7 +203,7 @@ function Navbar() {
               sx={{ margin: 2, height: '40px', fontSize: '15px' }}
             >
               <Typography variant='body2' sx={{ whiteSpace: 'nowrap' }}>
-                {t('how-to-play')}
+                游戏教程
               </Typography>
             </Button>
             <HowToPlay show={show} toggleShow={toggleShow} />
@@ -196,18 +211,17 @@ function Navbar() {
               <Select
                 color='primary'
                 className='navbar-language-switch'
-                defaultValue={router.locale ?? 'en'}
+                defaultValue={'zh'}
               >
-                {router.locales &&
-                  router.locales.map((lang) => (
-                    <MenuItem
-                      key={lang}
-                      value={lang}
-                      onClick={handleClick(lang)}
-                    >
-                      <Typography>{lang}</Typography>
-                    </MenuItem>
-                  ))}
+                {['en', 'zh'].map((lang) => (
+                  <MenuItem
+                    key={lang}
+                    value={lang}
+                    onClick={handleClick(lang)}
+                  >
+                    <Typography>{lang}</Typography>
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
           </Box>

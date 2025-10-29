@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Table,
   TableBody,
@@ -21,7 +21,6 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { Room, RoomPool } from '@/lib/types';
-import { useTranslation } from 'next-i18next';
 import StorageIcon from '@mui/icons-material/Storage';
 import { AddHomeOutlined, MapOutlined } from '@mui/icons-material';
 
@@ -34,8 +33,6 @@ function Lobby() {
   const [username, setUsername] = useState('');
   const [serverStatus, setServerStatus] = useState(true);
   const router = useRouter();
-
-  const { t } = useTranslation();
 
   useEffect(() => {
     console.log('fetching rooms from: ', process.env.NEXT_PUBLIC_SERVER_API);
@@ -132,7 +129,7 @@ function Lobby() {
               gutterBottom
               sx={{ padding: '20px' }}
             >
-              {t('greet') + username}
+              欢迎你，{username}
             </Typography>
             <List className='menu-container' sx={{ width: '100%' }}>
               <ListItem>
@@ -142,7 +139,7 @@ function Lobby() {
                 <ListItemText
                   id='block-empire-server'
                   primary={
-                    <Typography color='primary'>{t('gserver')}</Typography>
+                    <Typography color='primary'>方块帝国后端服务器</Typography>
                   }
                   secondary={process.env.NEXT_PUBLIC_SERVER_API}
                 />
@@ -159,7 +156,7 @@ function Lobby() {
                     }}
                   />
                   <Typography fontSize='0.9rem' color='white' sx={{ display: 'inline' }}>
-                    {serverStatus ? t('online') : t('offline')}
+                    {serverStatus ? '在线' : '离线'}
                   </Typography>
                 </Box>
               </ListItem>
@@ -183,11 +180,11 @@ function Lobby() {
                 <TableHead>
                   <TableRow>
                     {/* <TableCell></TableCell> */}
-                    {/* <TableCell>{t('room-id')}</TableCell> */}
-                    <TableCell>{t('room-name')}</TableCell>
-                    <TableCell align='center'>{t('game-speed')}</TableCell>
-                    <TableCell align='center'>{t('players')}</TableCell>
-                    <TableCell align='center'>{t('status')}</TableCell>
+                    {/* <TableCell>房间号</TableCell> */}
+                    <TableCell>房间名</TableCell>
+                    <TableCell align='center'>速度</TableCell>
+                    <TableCell align='center'>玩家列表</TableCell>
+                    <TableCell align='center'>状态</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -195,7 +192,7 @@ function Lobby() {
                     <TableRow>
                       <TableCell colSpan={6} align='center'>
                         <Typography variant='h6'>
-                          {t('joining-room')}
+                          加入房间中...
                         </Typography>
                         <CircularProgress />
                       </TableCell>
@@ -210,7 +207,7 @@ function Lobby() {
                   ) : Object.keys(rooms).length === 0 ? (
                     <TableRow>
                       <TableCell colSpan={6} align='center'>
-                        {t('no-rooms-available')}
+                        暂无房间
                       </TableCell>
                     </TableRow>
                   ) : (
@@ -239,7 +236,7 @@ function Lobby() {
                             variant='body2'
                             color={room.gameStarted ? 'yellow' : 'lightgreen'}
                           >
-                            {room.gameStarted ? t('started') : t('waiting')}
+                            {room.gameStarted ? '已开始' : '等待中'}
                           </Typography>
                         </TableCell>
                       </TableRow>
@@ -261,7 +258,7 @@ function Lobby() {
               }}
               onClick={handleCreateRoomClick}
             >
-              {t('create-room')}
+              创建房间
             </Button>
             <Button
               variant='contained'
@@ -278,7 +275,7 @@ function Lobby() {
                 router.push('/mapcreator');
               }}
             >
-              {t('create-map')}
+              创建地图PC
             </Button>
           </Box>
         </div>

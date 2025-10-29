@@ -1,5 +1,5 @@
 import { useEffect, useCallback, useState, memo } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Tab,
@@ -19,7 +19,6 @@ import StarRoundedIcon from '@mui/icons-material/StarRounded';
 import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { AspectRatioRounded, SearchRounded } from '@mui/icons-material';
-import { useTranslation } from 'next-i18next';
 
 interface ListItemProps {
   endpoint: string;
@@ -31,14 +30,13 @@ interface ListItemProps {
 
 const ListItem = memo<ListItemProps>(function MemoItems(props) {
   const { endpoint, map, handleStarClick, onSelect, starred } = props;
-  const { t } = useTranslation();
   const router = useRouter();
   return (
     <Card key={endpoint + map.id} sx={{ my: 2 }} variant='outlined'>
       <CardHeader
         sx={{ paddingBottom: 0 }}
         title={map.name}
-        subheader={`${t('created-by')} ${map.creator} ${new Date(
+        subheader={`创建者 ${map.creator} ${new Date(
           map.createdAt
         ).toLocaleDateString()}`}
         action={
@@ -89,7 +87,7 @@ const ListItem = memo<ListItemProps>(function MemoItems(props) {
           onClick={() => router.push(`/maps/${map.id}`)}
           sx={{ margin: 1, width: '100%' }}
         >
-          {t('view-map')}
+          查看地图
         </Button>
         {onSelect && (
           <Button
@@ -100,7 +98,7 @@ const ListItem = memo<ListItemProps>(function MemoItems(props) {
             }}
             sx={{ margin: 1, width: '100%' }}
           >
-            {t('choose-map')}
+            选择地图
           </Button>
         )}
       </CardActions>
@@ -120,7 +118,6 @@ export default function MapExplorer({ userId, onSelect }: MapExplorerProps) {
   const [starredMaps, setStarredMaps] = useState<{ [key: string]: boolean }>(
     {}
   );
-  const { t } = useTranslation();
 
   useEffect(() => {
     if (!userId) return;
@@ -216,10 +213,10 @@ export default function MapExplorer({ userId, onSelect }: MapExplorerProps) {
           onChange={handleTabChange}
           aria-label='basic tabs example'
         >
-          <Tab label={t('new')} />
-          <Tab label={t('hot')} />
-          <Tab label={t('best')} />
-          <Tab label={t('search')} />
+          <Tab label='最新' />
+          <Tab label='最热' />
+          <Tab label='最佳' />
+          <Tab label='搜索' />
         </Tabs>
       </Box>
       {tabIndex === 3 && (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import {
   Box,
   Card,
@@ -30,7 +30,6 @@ import LocationCityIcon from '@mui/icons-material/LocationCity';
 import WaterIcon from '@mui/icons-material/Water';
 import GroupIcon from '@mui/icons-material/Group';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
-import { useTranslation } from 'next-i18next';
 
 import SliderBox from './SliderBox';
 import PlayerTable from './PlayerTable';
@@ -66,8 +65,6 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
 
   const { room, socketRef, myPlayerId, myUserName, team } = useGame();
   const { roomDispatch, snackStateDispatch } = useGameDispatch();
-
-  const { t } = useTranslation();
 
   const router = useRouter();
 
@@ -237,7 +234,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                 snackStateDispatch({
                   type: 'update',
                   title: '',
-                  message: t('copied'),
+                  message: '已复制',
                   status: 'success',
                   duration: 3000,
                 });
@@ -264,7 +261,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
               }}
             >
               <Typography variant='caption' align='center'>
-                {t('not-host')}
+                您不是房主无法修改设置
               </Typography>
             </Box>
           )}
@@ -286,7 +283,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                 target='_blank'
                 rel='noopener noreferrer'
               >
-                {t('custom-map')}: {room.mapName}
+                地图: {room.mapName}
               </Typography>
               {!disabled_ui && (
                 <IconButton onClick={clearRoomMap}>
@@ -305,11 +302,11 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
             textColor='inherit'
             aria-label='game settings tabs'
           >
-            <Tab label={t('team')} />
-            <Tab label={t('game')} />
-            <Tab label={t('map')} />
-            <Tab label={t('terrain')} />
-            <Tab label={t('modifiers')} />
+            <Tab label="团队" />
+            <Tab label="游戏" />
+            <Tab label="地图" />
+            <Tab label="地形" />
+            <Tab label="修改器" />
           </Tabs>
           <TabPanel value={tabIndex} index={0}>
             <Box sx={{ display: 'flex', flexDirection: 'column', padding: 0 }}>
@@ -319,7 +316,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                   whiteSpace: 'nowrap',
                 }}
               >
-                {t('select-your-team')}
+                选择你的组队
               </Typography>
               <StyledToggleButtonGroup
                 color='primary'
@@ -350,7 +347,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                 disabled={disabled_ui}
                 onClick={handleOpenMapExplorer}
               >
-                {t('select-a-custom-map')}
+                选择自定义地图
               </Button>
 
               <Box
@@ -366,7 +363,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {t('game-speed')}
+                  速度
                 </Typography>
                 <ToggleButtonGroup
                   color='primary'
@@ -389,13 +386,13 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
           <TabPanel value={tabIndex} index={2}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <SliderBox
-                label={t('height')} // game's width and height is reversed
+                label="高度" // game's width and height is reversed
                 value={room.mapWidth}
                 disabled={disabled_ui}
                 handleChange={handleSettingChange('mapWidth')}
               />
               <SliderBox
-                label={t('width')} // game's width and height is reversed
+                label="宽度" // game's width and height is reversed
                 value={room.mapHeight}
                 disabled={disabled_ui}
                 handleChange={handleSettingChange('mapHeight')}
@@ -405,21 +402,21 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
           <TabPanel value={tabIndex} index={3}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <SliderBox
-                label={t('mountain')}
+                label="山丘"
                 value={room.mountain}
                 disabled={disabled_ui}
                 handleChange={handleSettingChange('mountain')}
                 icon={<TerrainIcon />}
               />
               <SliderBox
-                label={t('city')}
+                label="城池"
                 value={room.city}
                 disabled={disabled_ui}
                 handleChange={handleSettingChange('city')}
                 icon={<LocationCityIcon />}
               />
               <SliderBox
-                label={t('swamp')}
+                label="沼泽"
                 value={room.swamp}
                 disabled={disabled_ui}
                 handleChange={handleSettingChange('swamp')}
@@ -430,7 +427,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
           <TabPanel value={tabIndex} index={4}>
             <Box sx={{ display: 'flex', flexDirection: 'column' }}>
               <SliderBox
-                label={t('max-player-num')}
+                label="玩家数量"
                 value={room.maxPlayers}
                 valueLabelDisplay='auto'
                 disabled={disabled_ui}
@@ -453,7 +450,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                       disabled={disabled_ui}
                     />
                   }
-                  label={t('fog-of-war')}
+                  label="战争迷雾"
                 />
                 <FormControlLabel
                   control={
@@ -464,7 +461,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                       disabled={disabled_ui}
                     />
                   }
-                  label={t('reveal-king')}
+                  label="王位置可见"
                 />
                 <FormControlLabel
                   control={
@@ -475,7 +472,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                       disabled={disabled_ui}
                     />
                   }
-                  label={t('death-spectator')}
+                  label="允许死亡观战"
                 />
 
                 <FormControlLabel
@@ -487,7 +484,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
                       disabled={disabled_ui}
                     />
                   }
-                  label={t('warring-states-mode')}
+                  label="战国模式"
                 />
               </FormGroup>
             </Box>
@@ -515,7 +512,7 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
               }}
             >
               <Typography color='primary' fontWeight='bold'>
-                {t('players')}
+                玩家列表
               </Typography>
             </Box>
           }
@@ -548,8 +545,8 @@ const GameSetting: React.FC<GameSettingProps> = (props) => {
         }}
         onClick={handleClickForceStart}
       >
-        {/* {t('force-start')}({room.forceStartNum}/ */}
-        {t('ready')}({room.forceStartNum}/
+        {/* 提前开始({room.forceStartNum}/ */}
+        准备({room.forceStartNum}/
         {
           forceStartOK[
           room.players.filter((player) => !player.spectating).length

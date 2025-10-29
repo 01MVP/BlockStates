@@ -8,9 +8,8 @@ import {
   DialogContent,
   DialogContentText,
 } from '@mui/material';
-import { useTranslation } from 'next-i18next';
 import { useGame } from '@/context/GameContext';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { RoomUiStatus } from '@/lib/types';
 import { MaxTeamNum } from '@/lib/constants';
 
@@ -24,7 +23,6 @@ export default function SurrenderDialog({
   handleSurrender: () => void;
 }) {
   const { openOverDialog, isSurrendered, team, roomUiStatus } = useGame();
-  const { t } = useTranslation();
   const router = useRouter();
 
   const handleClose = useCallback(
@@ -77,8 +75,8 @@ export default function SurrenderDialog({
     >
       <DialogTitle>
         {showExitTitle
-          ? t('are-you-sure-to-exit')
-          : t('are-you-sure-to-surrender')}
+          ? '你确定要退出？'
+          : '你确定要投降？'}
       </DialogTitle>
       <Box
         sx={{
@@ -91,12 +89,12 @@ export default function SurrenderDialog({
       >
         {showExitTitle ? (
           <Button sx={{ width: '100%' }} onClick={handleExit}>
-            {t('exit')}
+            退出
           </Button>
         ) : (
           <>
             <Button sx={{ width: '100%' }} onClick={handleCloseSurrender}>
-              {t('surrender')}
+              投降
             </Button>
           </>
         )}
@@ -106,7 +104,7 @@ export default function SurrenderDialog({
             setOpen(false);
           }}
         >
-          {t('cancel')}
+          取消
         </Button>
       </Box>
     </Dialog>

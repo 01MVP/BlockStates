@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { io } from 'socket.io-client';
-import { useTranslation } from 'next-i18next';
 import ChatBox from '@/components/ChatBox';
 import Navbar from '@/components/Navbar';
 
@@ -28,9 +27,8 @@ function GamingRoom() {
   const myPlayerIdRef = useRef<string>(''); // fix useEffect don't get newest myPlayerId
 
   const router = useRouter();
-  const roomId = router.query.roomId as string;
-
-  const { t } = useTranslation();
+  const searchParams = useSearchParams();
+  const roomId = searchParams.get('roomId') as string;
 
   const {
     room,
@@ -234,13 +232,13 @@ function GamingRoom() {
     socket.on('captured', (player1: UserData, player2: UserData) => {
       setMessages((messages: any) => [
         ...messages,
-        new Message(player1, t('captured'), player2),
+        new Message(player1, '击败了', player2),
       ]);
     });
     socket.on('host_modification', (player1: UserData, player2: UserData) => {
       setMessages((messages: any) => [
         ...messages,
-        new Message(player1, t('transfer-host-to'), player2),
+        new Message(player1, '将房主转给了', player2),
       ]);
     });
     socket.on('game_over', (capturedBy: UserData) => {
@@ -316,7 +314,7 @@ function GamingRoom() {
     socket.on('reject_join', (message: string) => {
       snackStateDispatch({
         type: 'update',
-        title: t('reject-join'),
+        title: '拒绝加入',
         status: 'error',
         message: 'Please choose another room.',
         duration: null,

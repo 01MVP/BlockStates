@@ -9,7 +9,6 @@ import {
   Checkbox,
 } from '@mui/material';
 import useMediaQuery from '@mui/material/useMediaQuery';
-import { useTranslation } from 'next-i18next';
 import { useState, useEffect } from 'react';
 import { Player, LeaderBoardTable, UserData } from '@/lib/types';
 import { ColorArr, MaxTeamNum, WarringStates } from '@/lib/constants';
@@ -38,7 +37,6 @@ export default function LeaderBoard(props: LeaderBoardProps) {
     warringStatesMode = false,
   } = props;
   const [gameDockExpand, setGameDockExpand] = useState(true);
-  const { t } = useTranslation();
 
   if (!leaderBoardTable) return null;
 
@@ -118,7 +116,7 @@ export default function LeaderBoard(props: LeaderBoardProps) {
                 align='center'
                 sx={{ display: warringStatesMode ? '' : 'none' }}
               >
-                {t('country')}
+                国家
               </TableCell>
               <TableCell
                 align='center'
@@ -129,20 +127,20 @@ export default function LeaderBoard(props: LeaderBoardProps) {
                       : 'none',
                 }}
               >
-                {t('view')}
+                视角
               </TableCell>
               <TableCell
                 align='center'
                 sx={{ display: gameDockExpand ? '' : 'none' }}
               >
-                {t('player')}
+                玩家
               </TableCell>
               <TableCell
                 align='center'
                 sx={{ display: gameDockExpand ? 'none' : '', padding: '1px' }}
               ></TableCell>
-              <TableCell align='center'>{t('army')}</TableCell>
-              <TableCell align='center'>{t('land')}</TableCell>
+              <TableCell align='center'>兵力</TableCell>
+              <TableCell align='center'>领地</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

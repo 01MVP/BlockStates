@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { Box, IconButton } from '@mui/material';
-import { useTranslation } from 'next-i18next';
 import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import PingTest from '@/components/PingTest';
 import { Typography } from '@mui/material';
@@ -12,7 +11,6 @@ interface TurnsCountProps {
 
 function TurnsCount(props: TurnsCountProps) {
   const { count, handleReturnClick } = props;
-  const { t } = useTranslation();
   const [showPingTest, setShowPingTest] = useState(false);
 
   const displayTurnsCount = Math.floor(count / 2);
@@ -55,7 +53,7 @@ function TurnsCount(props: TurnsCountProps) {
           }}
         >
           <Typography color='white' >
-            {t('turn')}: {displayTurnsCount}
+            回合: {displayTurnsCount}
           </Typography>
         </div>
       </Box>

@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import { useTranslation } from 'next-i18next';
+import { useRouter } from 'next/navigation';
 import { UserData, RoomUiStatus } from '@/lib/types';
 import { useGame, useGameDispatch } from '@/context/GameContext';
 import {
@@ -18,7 +17,6 @@ export default function OverDialog() {
   const { myPlayerId, room, dialogContent, openOverDialog } = useGame();
   const { setRoomUiStatus, setOpenOverDialog } = useGameDispatch();
   const [replayLink, setReplayLink] = React.useState('');
-  const { t } = useTranslation();
   const router = useRouter();
 
   let title: string = '';
@@ -26,20 +24,20 @@ export default function OverDialog() {
   let [userData, game_status, replay_link] = dialogContent;
 
   if (game_status === 'game_surrender') {
-    title = t('you-surrender');
+    title = '你投降了！';
     subtitle = '';
   }
   if (userData) {
     if (game_status === 'game_over') {
-      title = t('game-over');
-      subtitle = `${t('captured-by')}: ${userData[0]?.username}`;
+      title = '游戏结束！';
+      subtitle = `被击败，胜者为: ${userData[0]?.username}`;
     }
     if (game_status === 'game_ended') {
       title =
         userData.filter((x) => x?.id === myPlayerId).length > 0
-          ? t('you-win')
-          : t('game-over');
-      subtitle = `${t('winner')}: ${userData
+          ? '你赢了！'
+          : '游戏结束！';
+      subtitle = `赢家: ${userData
         .map((x) => x?.username)
         .join(', ')}!`;
     }
@@ -87,15 +85,15 @@ export default function OverDialog() {
         }}
       >
         <Button sx={{ width: '100%' }} onClick={handleBackRoom}>
-          {room.gameStarted ? t('spectate') : t('play-again')}
+          {room.gameStarted ? '观战' : '再玩一次'}
         </Button>
         {replayLink && (
           <Button sx={{ width: '100%' }} onClick={handleWatchReplay}>
-            {t('watch-replay')}
+            查看回放
           </Button>
         )}
         <Button sx={{ width: '100%' }} onClick={handleExit}>
-          {t('exit')}
+          退出
         </Button>
         <Button
           sx={{ width: '100%' }}
@@ -103,7 +101,7 @@ export default function OverDialog() {
             setOpenOverDialog(false);
           }}
         >
-          {t('cancel')}
+          取消
         </Button>
       </Box>
     </Dialog>

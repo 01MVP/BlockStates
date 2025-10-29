@@ -1,8 +1,6 @@
 import { Avatar, Box, Typography, Button, TextField } from '@mui/material';
 import Image from 'next/image';
 
-import { useTranslation } from 'next-i18next';
-
 import { useState } from 'react';
 
 interface LoginProps {
@@ -12,7 +10,6 @@ interface LoginProps {
 
 const Login: React.FC<LoginProps> = (props) => {
   const { username, handlePlayClick } = props;
-  const { t } = useTranslation();
   const [inputName, setInputName] = useState('Anonymous');
 
   const handleUsernameChange = (event: any) => {
@@ -60,12 +57,12 @@ const Login: React.FC<LoginProps> = (props) => {
           }}
         >
           <Typography variant='h4' color='primary' sx={{ padding: 4 }}>
-            {t('welcome')}
+            登录方块帝国
           </Typography>
           <TextField
             sx={{ width: '100%' }}
             id='outlined-basic'
-            placeholder={t('username-placeholder')}
+            placeholder='输入用户名，不超过 15 个字符'
             // value={inputName}
             color='primary'
             focused
@@ -80,7 +77,7 @@ const Login: React.FC<LoginProps> = (props) => {
             onClick={() => handlePlayClick(inputName)}
             sx={{ margin: 2, width: '100%', height: '40px', fontSize: '15px' }}
           >
-            {t('play')}
+            开始游戏
           </Button>
         </Box>
       </Box>

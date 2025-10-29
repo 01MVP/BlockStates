@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { useTranslation } from 'next-i18next';
 import {
   Button,
   Dialog,
@@ -21,30 +20,28 @@ interface HowToPlayProps {
 }
 
 const HowToPlay: React.FC<HowToPlayProps> = ({ show, toggleShow }) => {
-  const { t } = useTranslation('common');
-
   const tableData = [
-    { label: t('howToPlay.move'), value: t('howToPlay.wsad') },
-    { label: t('howToPlay.openChat'), value: t('howToPlay.enter') },
-    { label: t('howToPlay.surrender'), value: 'Esc' },
-    { label: t('howToPlay.selectGeneral'), value: 'G' },
-    { label: t('howToPlay.centerGeneral'), value: 'H' },
-    { label: t('howToPlay.centerMap'), value: 'C' },
-    { label: t('howToPlay.toggle50'), value: t('howToPlay.how-to-toggle-50') },
-    { label: t('howToPlay.undoMove'), value: 'E' },
-    { label: t('howToPlay.clearQueuedMoves'), value: 'Q' },
-    { label: t('howToPlay.setZoom'), value: '1 / 2 / 3' },
-    { label: t('howToPlay.zoomInOut'), value: t('howToPlay.mouse-wheel') },
+    { label: '移动', value: 'WSAD / 方向键 / 鼠标点击 / 手机拖拽' },
+    { label: '打开聊天', value: '回车键' },
+    { label: '投降', value: 'Esc' },
+    { label: '选择将军', value: 'G' },
+    { label: '聚焦将军', value: 'H' },
+    { label: '地图居中', value: 'C' },
+    { label: '切换50%', value: 'Z / 鼠标两次点击 / 手机：快速触摸两次' },
+    { label: '撤销移动', value: 'E' },
+    { label: '清除队列中的移动', value: 'Q' },
+    { label: '设置预设缩放', value: '1 / 2 / 3' },
+    { label: '缩放', value: '鼠标滚轮' },
   ];
 
   return (
     <div>
       <Dialog open={show} onClose={toggleShow}>
-        <DialogTitle>{t('howToPlay.title')}</DialogTitle>
+        <DialogTitle>如何玩</DialogTitle>
         <DialogContent>
           <div>
             <div style={{ display: 'flex' }}>
-              <Typography variant='body1'>{t('howToPlay.goal')}</Typography>
+              <Typography variant='body1'>你的目标是占领其他所有玩家的将军</Typography>
               <Image
                 src={TileType2Image[TileType.King]}
                 alt='king'
@@ -57,7 +54,7 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ show, toggleShow }) => {
             </div>
 
             <ul>
-              <li>{t('howToPlay.plains')}</li>
+              <li>平原每25回合产生一个小兵，尽可能扩张你的领土！</li>
               <li>
                 <div style={{ display: 'flex' }}>
                   <Image
@@ -69,18 +66,18 @@ const HowToPlay: React.FC<HowToPlayProps> = ({ show, toggleShow }) => {
                       backgroundColor: 'white',
                     }}
                   />
-                  {t('howToPlay.cities')}
+                  城市和将军每回合产生一个小兵
                 </div>
               </li>
-              <li>{t('howToPlay.moves')}</li>
-              <li>{t('howToPlay.capture')}</li>
+              <li>你每回合可以移动两次。</li>
+              <li>当你占领敌方将军时，他的所有领土和兵力都属于你，但兵力会减半。</li>
             </ul>
-            <Typography variant='body1'>{t('howToPlay.shortcut')}</Typography>
+            <Typography variant='body1'>快捷键</Typography>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>{t('howToPlay.shortcut')}</TableCell>
-                  <TableCell>{t('howToPlay.key')}</TableCell>
+                  <TableCell>快捷键</TableCell>
+                  <TableCell>键位</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

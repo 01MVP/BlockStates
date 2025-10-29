@@ -8,7 +8,7 @@ import {
   useReducer,
 } from 'react';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Box,
   ButtonGroup,
@@ -34,7 +34,6 @@ import {
   CustomMapData,
 } from '@/lib/types';
 import CustomMapTile from '@/components/game/CustomMapTile';
-import { useTranslation } from 'next-i18next';
 import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import ClearIcon from '@mui/icons-material/Clear';
 import { AspectRatioRounded, InfoRounded } from '@mui/icons-material';
@@ -89,7 +88,6 @@ function MapEditor({ editMode }: { editMode: boolean }) {
   const [mapName, setMapName] = useState('');
   const [mapDescription, setMapDescription] = useState('');
   const [draftSaved, setDraftSaved] = useState(false);
-  const { t } = useTranslation();
   const [snackState, snackStateDispatch] = useReducer(snackStateReducer, {
     open: false,
     title: '',
@@ -104,7 +102,8 @@ function MapEditor({ editMode }: { editMode: boolean }) {
   const [publishMapId, setPublishMapId] = useState('');
 
   const router = useRouter();
-  const mapId = router.query.mapId as string;
+  const searchParams = useSearchParams();
+  const mapId = searchParams.get('mapId') as string;
 
   const {
     tileSize,
@@ -339,7 +338,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
       snackStateDispatch({
         type: 'update',
         title: 'Error',
-        message: t('Map name cannot be empty'),
+        message: '地图名称不能为空',
         duration: null,
       });
       return;
@@ -436,7 +435,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
           snackStateDispatch({
             type: 'update',
             title: 'Error',
-            message: t('Error parsing JSON file'),
+            message: '解析 JSON 文件时出错',
             duration: 5000,
           });
         }
@@ -543,7 +542,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
           {snackState.message}
         </Alert>
       </Snackbar>
-      {!editMode && <Loading open={loading} title={t('loading-map')} />}
+      {!editMode && <Loading open={loading} title="加载地图中" />}
       {!editMode && (
         <>
           <Box
@@ -585,7 +584,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
             color='primary'
             onClick={handleDownloadMap}
           >
-            {t('download')}
+            下载文件
           </Button>
         </>
       )}
@@ -596,12 +595,12 @@ function MapEditor({ editMode }: { editMode: boolean }) {
       ></PublishMapDialog>
 
       <Dialog open={openMapExplorer} onClose={handleCloseMapExplorer}>
-        <DialogTitle>{t('choose-map')}</DialogTitle>
+        <DialogTitle>选择地图</DialogTitle>
         <DialogContent>
           <MapExplorer userId={username} onSelect={handleMapSelect} />
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseMapExplorer}>{t('close')}</Button>
+          <Button onClick={handleCloseMapExplorer}>关闭</Button>
         </DialogActions>
       </Dialog>
 
@@ -630,7 +629,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
             variant='contained'
             onClick={handleOpenMapExplorer}
           >
-            {t('select-a-custom-map')}
+            选择自定义地图
           </Button>
 
           <Card
@@ -642,7 +641,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
           >
             <CardHeader
               avatar={<InfoRounded />}
-              title={t('basic-info')}
+              title="基础信息"
               sx={{ paddingBottom: 0 }}
             />
             <CardContent
@@ -683,7 +682,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
               width: '100%',
             }}
           >
-            <CardHeader avatar={<AspectRatioRounded />} title={t('map-size')} />
+            <CardHeader avatar={<AspectRatioRounded />} title="地图大小" />
             <CardContent
               sx={{
                 display: 'flex',
@@ -717,14 +716,14 @@ function MapEditor({ editMode }: { editMode: boolean }) {
               variant='outlined'
               onClick={handleDownloadMap}
             >
-              {t('download')}
+              下载文件
             </Button>
             <Button
               sx={{ width: '100%' }}
               variant='outlined'
               onClick={handleUploadMap}
             >
-              {t('upload')}
+              上传文件
             </Button>
           </ButtonGroup>
           <ButtonGroup size='large' sx={{ width: '100%' }}>
@@ -733,14 +732,14 @@ function MapEditor({ editMode }: { editMode: boolean }) {
               variant='outlined'
               onClick={handleSaveDraft}
             >
-              {t('save-draft')}
+              保存草稿
             </Button>
             <Button
               sx={{ width: '100%' }}
               variant='contained'
               onClick={handlePublish}
             >
-              {t('publish')}
+              发布
             </Button>
           </ButtonGroup>
         </Box>
@@ -794,7 +793,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
                   />
                 )}
                 <Typography align='center' color='white' fontSize='8rm'>
-                  {t(tileName)}
+                  {tileName === 'king' ? '王' : tileName === 'city' ? '城池' : tileName === 'plain' ? '平原' : tileName === 'mountain' ? '山丘' : tileName === 'swamp' ? '沼泽' : tileName}
                 </Typography>
               </IconBox>
             ))}
@@ -835,7 +834,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
                   />
                 )}
                 <Typography align='center' color='white' fontSize='8rm'>
-                  {t(property)}
+                  {property === 'team' ? '团队' : property === 'unitsCount' ? '兵数' : property === 'priority' ? '优先级' : property === 'revealed' ? '全局可见' : property}
                 </Typography>
               </IconBox>
             ))}
@@ -856,7 +855,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
                 }}
               />
               <Typography align='center' color='white' fontSize='8rm'>
-                {t('clear-all')}
+                清除全部
               </Typography>
             </IconBox>
           </Box>

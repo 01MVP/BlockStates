@@ -1,5 +1,4 @@
 import { styled } from '@mui/material/styles';
-import { useTranslation } from 'next-i18next';
 
 const FooterContainer = styled('div')`
   position: absolute;
@@ -17,14 +16,13 @@ const FooterContainer = styled('div')`
 `;
 
 function Footer() {
-  const { t } = useTranslation();
   const chinaWebsite: boolean = process.env.NEXT_PUBLIC_SERVER_API.endsWith('cn');
 
   return (
     <FooterContainer>
       <div style={{ color: 'white' }}>
-        {t('all-right-reserved')} © 2022~{new Date().getFullYear()} Block Empire &nbsp;
-        {t('open-source-team')}
+        版权所有 © 2022~{new Date().getFullYear()} Block Empire &nbsp;
+        开源团队
       </div>
       {
         chinaWebsite && <a style={{ color: 'skyblue' }} href='https://beian.miit.gov.cn'>

@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
-import { useRouter } from 'next/router';
+import { useRouter, useSearchParams } from 'next/navigation';
 import {
   Box,
   Slider,
@@ -37,7 +37,6 @@ import {
 } from '@/lib/types';
 import TurnsCount from './TurnsCount';
 import LeaderBoard from './LeaderBoard';
-import { useTranslation } from 'next-i18next';
 import GameLoading from '@/components/GameLoading';
 import GameRecord from '@/lib/game-record';
 import ChatBox from '@/components/ChatBox';
@@ -56,7 +55,6 @@ export default function GameReplay(props: any) {
   const [mapData, mapDataDispatch] = useReducer(mapDataReducer, [[]]);
   const [limitedView, setLimitedView] = useState<TileProp[][]>([[]]);
   const [checkedPlayers, setCheckedPlayers] = useState<UserData[]>([]);
-  const { t } = useTranslation();
   const [notFoundError, setNotFoundError] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const intervalId = useRef<any>(undefined);
@@ -73,7 +71,8 @@ export default function GameReplay(props: any) {
   } = useMap({ mapWidth, mapHeight });
 
   const router = useRouter();
-  const replayId = router.query.replayId as string;
+  const searchParams = useSearchParams();
+  const replayId = searchParams.get('replayId') as string;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -242,7 +241,7 @@ export default function GameReplay(props: any) {
   if (notFoundError) {
     return (
       <div className='menu-container'>
-        <Typography variant='h4'>{t('Replay not found')}</Typography>
+        <Typography variant='h4'>回放未找到</Typography>
       </div>
     );
   }

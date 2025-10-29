@@ -1,7 +1,6 @@
 import { styled } from "@mui/material/styles";
 import React, { useState, useEffect, useRef } from "react";
 import { InputBase, Divider } from "@mui/material";
-import { useTranslation } from "next-i18next";
 import { Socket } from "socket.io-client";
 import { Message } from "@/lib/types";
 import { ColorArr } from "@/lib/constants";
@@ -119,8 +118,6 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
     setIsExpand(!isSmallScreen);
   }, [isSmallScreen]);
 
-  const { t } = useTranslation();
-
   const handleInputKeyDown = (event: any) => {
     if (event.key === "Enter") {
       handleSendMessage();
@@ -179,7 +176,7 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
                 width: "100%",
                 padding: "5px 10px",
               }}
-              placeholder={t("type-a-message")}
+              placeholder="开始聊天，回车发送"
               size="medium"
               value={inputValue}
               onChange={handleInputChange}

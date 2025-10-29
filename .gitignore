@@ -6,3 +6,5 @@ server/custom_map/*
 .env.local
 temp.md
 GenniaBot
+temp/
+.cache/
