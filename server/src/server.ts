@@ -309,12 +309,7 @@ async function handleDisconnectInRoom(room: Room, player: Player, io: Server) {
       room.players = room.players.filter((p) => p.id != player.id);
     }
 
-    room.forceStartNum = 0;
-    for (let i = 0, c = 0; i < room.players.length; ++i) {
-      if (room.players[i].forceStart) {
-        ++room.forceStartNum;
-      }
-    }
+    room.forceStartNum = room.players.filter(player => player.forceStart).length;
     if (room.players.length < 1 && !room.keepAlive) {
       delete roomPool[room.id];
     } else {
@@ -381,7 +376,7 @@ async function handleGame(room: Room, io: Server) {
     // todo 对于自定义地图，地图名称应该在游戏开始前获知，而不是开始时
     console.info(`Start game`);
     room.gameStarted = true;
-    let intro_message = 'Chat is being recorded. 欢迎加入游戏 QQ 群: 374889821';
+    let intro_message = 'Chat is being recorded. ';
     room.gameRecord.addMessage({ turn: room.map.turn, player: null, content: intro_message });
     io.in(room.id).emit('update_room', room);
     io.in(room.id).emit('room_message', null, intro_message);
@@ -402,8 +397,14 @@ async function handleGame(room: Room, io: Server) {
     room.gameLoop = setInterval(async () => {
       try {
         room.players.forEach((player) => {
-          if (!room.map) throw new Error('king is null');
+          if (!room.map) throw new Error('map is null');
           if (!player.isDead && !player.spectating() && !player.disconnected) {
+            // Add null check for player.king
+            if (!player.king) {
+              console.error('Error! player.king is null for player:', player.username);
+              player.isDead = true;
+              return;
+            }
             let block = room.map.getBlock(player.king);
             let blockPlayerIndex = getPlayerIndex(room, block.player?.id);
             if (blockPlayerIndex !== -1) {
@@ -470,7 +471,14 @@ async function handleGame(room: Room, io: Server) {
         }
         // Game over, Find Winner
         if (aliveTeams.length <= 1) {
-          if (!aliveTeams.length) return;
+          if (!aliveTeams.length) {
+            // Clean up game loop even if no winners
+            if (room.gameLoop) {
+              clearInterval(room.gameLoop);
+              room.gameLoop = null;
+            }
+            return;
+          }
           let link = room.gameRecord.outPutToJSON(process.cwd());
           io.in(room.id).emit(
             'game_ended',
@@ -488,7 +496,11 @@ async function handleGame(room: Room, io: Server) {
           });
 
           room.players = room.players.filter((p) => !p.disconnected);
-          clearInterval(room.gameLoop);
+          // Clean up game loop
+          if (room.gameLoop) {
+            clearInterval(room.gameLoop);
+            room.gameLoop = null;
+          }
         }
       } catch (e: any) {
         console.error(JSON.stringify(e, ['message', 'arguments', 'type', 'name']));
@@ -569,10 +581,9 @@ io.on('connection', async (socket) => {
 
     if (playerIndex !== -1) {
       isValidReconnectPlayer = true;
-      room.players = room.players.filter((p) => p !== player);
       player = room.players[playerIndex];
       player.disconnected = false;
-      room.players[playerIndex].socket_id = socket.id;
+      player.socket_id = socket.id;
       io.in(room.id).emit('room_message', player.minify(), 're-joined the lobby.');
       io.in(room.id).emit('update_room', room);
     }
@@ -643,11 +654,12 @@ io.on('connection', async (socket) => {
   });
 
   socket.on('set_team', async (team) => {
-    if ((team as number) <= 0 || (team as number) > MaxTeamNum + 1) {
+    const teamNum = Number(team);
+    if (isNaN(teamNum) || teamNum <= 0 || teamNum > MaxTeamNum + 1) {
       socket.emit('error', 'Unable to change team', `Team must be between 1 and ${MaxTeamNum} or spectators`);
       return;
     }
-    player.team = team as number;
+    player.team = teamNum;
 
     if (player.spectating()) {
       // set spectate will cancel force start
@@ -816,10 +828,28 @@ io.on('connection', async (socket) => {
 
   socket.on('attack', async (from: Point, to: Point, isHalf: boolean) => {
     try {
+      // Validate parameter types
       if (typeof isHalf !== 'boolean') {
         socket.emit('attack_failure', from, to, 'Invalid parameter type');
         return;
       }
+
+      // Validate Point objects structure
+      if (!from || typeof from.x !== 'number' || typeof from.y !== 'number' ||
+          !to || typeof to.x !== 'number' || typeof to.y !== 'number' ||
+          !Number.isInteger(from.x) || !Number.isInteger(from.y) ||
+          !Number.isInteger(to.x) || !Number.isInteger(to.y)) {
+        socket.emit('attack_failure', from, to, 'Invalid coordinate format');
+        return;
+      }
+
+      // Validate room and map exist
+      if (!room || !room.map) {
+        socket.emit('attack_failure', from, to, 'Game not ready');
+        return;
+      }
+
+      // Validate coordinates are within map bounds
       if (from.x < 0 || from.x >= room.map.width || from.y < 0 || from.y >= room.map.height) {
         socket.emit('attack_failure', from, to, 'Invalid starting point');
         return;
@@ -830,6 +860,7 @@ io.on('connection', async (socket) => {
         return;
       }
 
+      // Validate movement distance (adjacent tiles only)
       if (Math.abs(from.x - to.x) > 1 || Math.abs(from.y - to.y) > 1) {
         socket.emit('attack_failure', from, to, 'Invalid ending point, not adjacent');
         return;
