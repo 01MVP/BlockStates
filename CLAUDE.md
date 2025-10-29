@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Gennia is a real-time multiplayer strategy game server and client, inspired by generals.io. The goal is to capture enemy generals without losing your own. It's built as a monorepo with:
+Block Empire (方块帝国) is a real-time multiplayer strategy game server and client, inspired by generals.io. The goal is to capture enemy generals without losing your own. It's built as a monorepo with:
 - **Client**: Next.js 13 with React, TypeScript, Socket.io-client, Material-UI
 - **Server**: Express + Socket.io with TypeScript, Prisma + PostgreSQL
 
@@ -145,4 +145,4 @@ Two models in Prisma:
 - **Force start mechanism**: Players vote to start; when threshold reached (`forceStartOK`), game begins
 - **Team system**: Supports multiple teams (MaxTeamNum), players on same team share victory
 - **Map generation**: Random maps generated based on room settings (mapWidth, mapHeight, mountain, city density) or custom maps loaded from database
-- **Domain**: Current production domain is gennia.online (previously gennia.io)
+- **Domain**: Current production domain is block-empire.com 

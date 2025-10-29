@@ -140,7 +140,7 @@ function Lobby() {
                   <StorageIcon />
                 </ListItemIcon>
                 <ListItemText
-                  id='gennia-server'
+                  id='block-empire-server'
                   primary={
                     <Typography color='primary'>{t('gserver')}</Typography>
                   }

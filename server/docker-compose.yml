@@ -29,11 +29,11 @@ services:
     restart: unless-stopped
 
   # todo: fix symlink
-  # gennia-server:
+  # block-empire-server:
   #   build:
   #     context: .
   #     dockerfile: Dockerfile
-  #   container_name: gennia-server
+  #   container_name: block-empire-server
   #   depends_on:
   #     - postgres
   #   ports:

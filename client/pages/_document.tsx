@@ -33,9 +33,9 @@ export default function Document() {
 
       <meta
         name='description'
-        content='A real-time multiplayer game built with Nextjs Socket.IO'
+        content='方块帝国 - 一款基于 Next.js Socket.IO 构建的实时多人策略游戏'
       />
-      <meta name='keywords' content='Gennia, multiplayer-game'></meta>
+      <meta name='keywords' content='方块帝国, Block Empire, 多人游戏, 策略游戏'></meta>
       <body>
         <Main />
         <NextScript />

@@ -31,19 +31,19 @@ import {
 
 const navItems = [
   { href: '/', label: 'home', icon: <HomeRounded /> },
-  { href: 'https://docs.gennia.online/', label: 'wiki', icon: <BookRounded /> },
+  { href: 'https://docs.block-empire.com/', label: 'wiki', icon: <BookRounded /> },
   {
-    href: 'https://github.com/GenniaApp/GenniaServer2',
+    href: 'https://github.com/01MVP/BlockEmpire',
     label: 'github',
     icon: <GitHub />,
   },
   {
-    href: 'https://github.com/GenniaApp/GenniaBot',
+    href: 'https://github.com/01MVP/BlockEmpire',
     label: 'bot-api',
     icon: <SmartToyRounded />,
   },
   {
-    href: 'https://github.com/GenniaApp/GenniaServer2/issues',
+    href: 'https://github.com/01MVP/BlockEmpire/issues',
     label: 'feedback',
     icon: <FeedbackRounded />,
   },
@@ -99,10 +99,10 @@ function Navbar() {
               style={{ display: 'flex', alignItems: 'center', flexGrow: 0 }}
             >
               <Image
-                src='/img/gennia-logo.png'
+                src='/img/block-empire-logo.png'
                 width={100}
                 height={17.3}
-                alt='Gennia logo'
+                alt='Block Empire logo'
               />
             </Link>
           </Box>
@@ -148,10 +148,10 @@ function Navbar() {
               style={{ display: 'flex', alignItems: 'center', flexGrow: 0 }}
             >
               <Image
-                src='/img/gennia-logo.png'
+                src='/img/block-empire-logo.png'
                 width={100}
                 height={17.3}
-                alt='Gennia logo'
+                alt='Block Empire logo'
               />
             </Link>
           </Box>

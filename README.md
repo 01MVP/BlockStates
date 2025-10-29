@@ -1,79 +1,79 @@
-## GenniaServer 2
+## 方块帝国 (Block Empire)
 
 <h1 align="center">
-  <img src="client/public/img/favicon.png" style="height: 90px;"alt="Gennia">
+  <img src="client/public/img/favicon.png" style="height: 90px;"alt="方块帝国">
   <br>
-  <img src="client/public/img/gennia-logo.png" style="height: 30px;"alt="Gennia">
+  <img src="client/public/img/block-empire-logo.png" style="height: 30px;"alt="方块帝国">
 </h1>
 
-> [Gennia](https://gennia.online): Yet another generals.io clone server & client
+> [方块帝国](https://block-empire.com): 受 generals.io 启发的实时多人策略游戏
 
 <h5 align="center">
-<img src="gennia-pc.png" width="400" >
+<img src="block-empire-pc.png" width="400" >
 
-Gennia PC demo
+方块帝国 PC 端演示
 
-<img src="gennia-mobile.png" width="300" >
+<img src="block-empire-mobile.png" width="300" >
 
-Gennia Mobile demo
+方块帝国移动端演示
 
 </h5>
 
-What is GenniaServer 2?
+什么是方块帝国？
 
-- A realtime multiplayer game where the goal is to capture all of the enemy's general without losing your own
-- using react/nextjs/socket/express
-- inspired by [generals.io](https://generals.io), the game mode will be different from generals.io in the future.
+- 一款实时多人策略游戏，目标是占领敌方主将同时保护自己的主将
+- 使用 React/Next.js/Socket/Express 技术栈
+- 灵感来自 [generals.io](https://generals.io)，未来将有不同于 generals.io 的游戏模式
 
-## How to Play
+## 游戏玩法
 
-Your goal is to capture other generals.
+你的目标是占领其他玩家的主将。
 
-- Plains produce one unit every 25 turns
-- Cities and generals produce one unit every turn
-- You can move twice per turn.
-- When you capture the enemy general, all his territory belongs to you and his army strength is halved and becomes yours.
+- 平原每 25 回合生产一个单位
+- 城市和主将每回合生产一个单位
+- 你每回合可以移动两次
+- 当你占领敌方主将时，其所有领土归你所有，其军队数量减半后加入你的部队
 
-| function           | keyboard     |
-| ------------------ | ------------ |
-| Move Around        | WSAD         |
-| Move On Mobile     | Touch & Drag |
-| Open Chat          | Enter        |
-| Undo Move          | e            |
-| Clear Queued Moves | q            |
-| Select on general  | g            |
-| Center on home     | h            |
-| Center Map         | c            |
-| Toggle 50%         | z            |
-| Set Zoom to Preset | 1 / 2 / 3    |
-| Zoom in / out      | mouse wheel  |
-| Surrender          | escape       |
+| 功能               | 键盘操作        |
+| ------------------ | --------------- |
+| 移动               | WSAD            |
+| 移动端操作         | 触摸拖拽        |
+| 打开聊天           | Enter           |
+| 撤销移动           | e               |
+| 清空队列移动       | q               |
+| 选择主将           | g               |
+| 居中显示基地       | h               |
+| 居中显示地图       | c               |
+| 切换50%移动        | z               |
+| 设置缩放级别       | 1 / 2 / 3       |
+| 放大/缩小          | 鼠标滚轮        |
+| 投降               | Escape          |
 
-## Supported Feature
+## 支持的功能
 
-### Basic
+### 基础功能
 
-- [x] Create Custom Map
-- [x] [Game Bot](https://github.com/GenniaApp/GenniaBot)
-- [x] Replays
-- [x] Mobile Support (Drag to attack)
-- [x] Lobby & Custom Game
-- [x] Room Chat
-- [ ] Team
+- [x] 创建自定义地图
+- [x] [游戏机器人](https://github.com/01MVP/BlockEmpire)
+- [x] 游戏回放
+- [x] 移动端支持（拖拽攻击）
+- [x] 大厅 & 自定义游戏
+- [x] 房间聊天
+- [ ] 团队模式
 
-### Game Modifier
+### 游戏修饰符
 
-- [x] Fog of War
-- [x] Spectator
-- [x] Warring States (Reveal all King)
-- [ ] Move All Armys
-- [ ] Movable King
+- [x] 战争迷雾
+- [x] 观战模式
+- [x] 春秋战国模式（显示所有主将）
+- [ ] 移动所有军队
+- [ ] 可移动主将
 
-## Development
+## 开发
 
-### client: nextjs
+### 客户端：Next.js
 
-First, run the development server:
+首先，运行开发服务器：
 
 ```bash
 cd client/
@@ -81,22 +81,22 @@ pnpm install
 pnpm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+在浏览器中打开 [http://localhost:3000](http://localhost:3000) 查看结果。
 
-#### database
+#### 数据库
 
-We use postgresql + prisma
+我们使用 PostgreSQL + Prisma
 
-- see `.env.example` to config prisma env correctly
-- if you init repo or edit prisma schema, run `pnpx prisma migrate dev` to make sure update schema in database and update prisma client
+- 查看 `.env.example` 来正确配置 Prisma 环境变量
+- 如果你初始化仓库或编辑 Prisma schema，运行 `pnpx prisma migrate dev` 来确保更新数据库架构和 Prisma 客户端
 
 ```
-npx prisma generate # generate prisma client code
-npx prisma migrate dev # migrate
-pnpm dlx prisma studio # open databaseUI
+npx prisma generate # 生成 Prisma 客户端代码
+npx prisma migrate dev # 运行迁移
+pnpm dlx prisma studio # 打开数据库 UI
 ```
 
-### server: express + socket.io
+### 服务端：Express + Socket.io
 
 
 ```bash
@@ -106,34 +106,34 @@ pnpm dlx prisma migrate dev
 pnpm run dev
 ```
 
-#### docker
+#### Docker
 
-- setup postgresql and pyadmin to manage data
+- 设置 PostgreSQL 和 PgAdmin 来管理数据
 
 ```
 docker-compose up -d
 ```
 
-## Deployment
+## 部署
 
-- [PM2](https://pm2.keymetrics.io/docs/usage/quick-start/) is a production process manager for Node.js applications, which is very easy to use.
-- docker-compose: for setup database
+- [PM2](https://pm2.keymetrics.io/docs/usage/quick-start/) 是 Node.js 应用的生产进程管理器，非常容易使用
+- docker-compose：用于设置数据库
 
-- see `make deploy` and `make restart` in Makefile
-- to set the application to restart on startup see: https://pm2.keymetrics.io/docs/usage/startup/
+- 查看 Makefile 中的 `make deploy` 和 `make restart`
+- 设置应用开机自启请参考：https://pm2.keymetrics.io/docs/usage/startup/
 
-## [Roadmap](https://github.com/orgs/GenniaApp/projects/1)
+## [开发路线图](https://github.com/01MVP/BlockEmpire/projects)
 
-## JoinUs
+## 加入我们
 
-- QQ Group : 374889821
+- QQ 群：374889821
 - [Discord](https://discord.gg/p9BfpwBF)
 
-## License
+## 许可证
 
-Distributed under the GNU GENERAL PUBLIC LICENSE VERSION 3. See `LICENSE.txt` for more information.
+基于 GNU GENERAL PUBLIC LICENSE VERSION 3 许可证发布。详情请参见 `LICENSE.txt`。
 
-## Acknowledgments
+## 致谢
 
 - [MadJS](https://github.com/fluffybeastgames/MadJS/)
 - [generals-io-webapp](https://github.com/dhyegocalota/generals-io-webapp)

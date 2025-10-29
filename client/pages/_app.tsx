@@ -14,7 +14,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     <>
       <Head>
-        <title>Gennia</title>
+        <title>方块帝国 (Block Empire)</title>
       </Head>
       <Component {...pageProps} />
       <GoogleAnalytics trackPageViews />
