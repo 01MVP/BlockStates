@@ -1,35 +1,26 @@
-import { styled } from '@mui/material/styles';
-
-const FooterContainer = styled('div')`
-  position: absolute;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  width: 100vw;
-  height: max-content;
-  bottom: 0;
-  left: 0;
-  z-index: 80;
-  backdrop-filter: blur(3px);
-  background-color: #212936 !important;
-`;
+import Link from 'next/link';
 
 function Footer() {
   const chinaWebsite: boolean = process.env.NEXT_PUBLIC_SERVER_API.endsWith('cn');
 
   return (
-    <FooterContainer>
-      <div style={{ color: 'white' }}>
-        版权所有 © 2022~{new Date().getFullYear()} Block Empire &nbsp;
-        开源团队
+    <footer className="mt-auto w-full border-t-2 border-border-main bg-white/80 py-6 backdrop-blur-lg">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 text-sm text-text-muted">
+        <p>
+          版权所有 © 2022~{new Date().getFullYear()} Block Empire 开源团队
+        </p>
+        {chinaWebsite && (
+          <Link
+            href="https://beian.miit.gov.cn"
+            target="_blank"
+            rel="noreferrer noopener"
+            className="text-sm text-player-2 underline-offset-4 hover:underline"
+          >
+            粤ICP备2022122081号-2
+          </Link>
+        )}
       </div>
-      {
-        chinaWebsite && <a style={{ color: 'skyblue' }} href='https://beian.miit.gov.cn'>
-          粤ICP备2022122081号-2
-        </a>
-      }
-    </FooterContainer>
+    </footer>
   );
 }
 

@@ -1,8 +1,5 @@
 import { useState } from 'react';
-import { Box, IconButton } from '@mui/material';
-import ArrowBackRoundedIcon from '@mui/icons-material/ArrowBackRounded';
 import PingTest from '@/components/PingTest';
-import { Typography } from '@mui/material';
 
 interface TurnsCountProps {
   count: number;
@@ -20,45 +17,33 @@ function TurnsCount(props: TurnsCountProps) {
   };
 
   return (
-    <Box
-      style={{
-        position: 'absolute',
-        left: '1px',
-        top: '0px',
-        zIndex: '110',
-        display: 'flex',
-        alignItems: 'center',
-        flexDirection: 'column',
-      }}
+    <div
+      className="fixed left-2 top-2 z-tooltip flex flex-col items-start gap-2"
       onDoubleClick={handleDoubleClick}
     >
-      <Box
-        className='menu-container'
-        sx={{
-          display: 'flex',
-          alignItems: 'center',
-          borderRadius: '0 24px 24px 0 !important',
-          boxShadow: 1,
-          padding: { xs: '0.4rem !important', md: '0.6rem !important' },
-        }}
+      <div
+        className="flex items-center gap-3 rounded-r-3xl border-2 border-border-main bg-white/90 px-4 py-2 shadow-lg backdrop-blur"
       >
-        <IconButton onClick={handleReturnClick} color='primary'>
-          <ArrowBackRoundedIcon />
-        </IconButton>
-        <div
-          style={{
-            display: 'inline-block',
-            fontSize: '1em',
-            marginRight: '0.5em',
-          }}
+        <button
+          type="button"
+          onClick={handleReturnClick}
+          className="icon-btn border-none bg-transparent p-1 text-text-primary hover:bg-bg-main"
+          aria-label="返回房间"
         >
-          <Typography color='white' >
-            回合: {displayTurnsCount}
-          </Typography>
+          <svg
+            viewBox="0 0 24 24"
+            className="h-6 w-6 fill-none stroke-current"
+            strokeWidth={1.8}
+          >
+            <path d="M15 18l-6-6 6-6" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </button>
+        <div className="text-sm font-medium text-text-primary">
+          回合: {displayTurnsCount}
         </div>
-      </Box>
+      </div>
       {showPingTest && <PingTest />}
-    </Box>
+    </div>
   );
 }
 

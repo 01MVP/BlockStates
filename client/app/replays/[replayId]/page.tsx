@@ -1,16 +1,19 @@
 'use client';
 
 import { Suspense } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
-import theme from '@/components/theme';
 import GameReplay from '@/components/game/GameReplay';
+import Spinner from '@/components/ui/Spinner';
 
 export default function ReplayPage() {
   return (
-    <ThemeProvider theme={theme}>
-      <Suspense fallback={<div>Loading...</div>}>
-        <GameReplay />
-      </Suspense>
-    </ThemeProvider>
+    <Suspense
+      fallback={
+        <div className="flex min-h-screen items-center justify-center">
+          <Spinner size="lg" />
+        </div>
+      }
+    >
+      <GameReplay />
+    </Suspense>
   );
 }

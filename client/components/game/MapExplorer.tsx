@@ -1,27 +1,17 @@
 import { useEffect, useCallback, useState, memo } from 'react';
 import { useRouter } from 'next/navigation';
+import clsx from 'classnames';
+
 import {
-  Box,
-  Tab,
-  Tabs,
-  TextField,
-  Card,
-  CardContent,
-  Typography,
-  Button,
-  CardActions,
-  CardHeader,
-  InputAdornment,
-} from '@mui/material';
+  StarSolidIcon,
+  StarIcon,
+  EyeIcon,
+  AspectRatioIcon,
+  SearchIcon,
+} from '@/components/ui/icons';
 import { CustomMapInfo } from '@/lib/types';
-import IconButton from '@mui/material/IconButton';
-import StarRoundedIcon from '@mui/icons-material/StarRounded';
-import StarBorderRoundedIcon from '@mui/icons-material/StarBorderRounded';
-import VisibilityIcon from '@mui/icons-material/Visibility';
-import { AspectRatioRounded, SearchRounded } from '@mui/icons-material';
 
 interface ListItemProps {
-  endpoint: string;
   map: CustomMapInfo;
   handleStarClick: any;
   onSelect: any;
@@ -29,80 +19,75 @@ interface ListItemProps {
 }
 
 const ListItem = memo<ListItemProps>(function MemoItems(props) {
-  const { endpoint, map, handleStarClick, onSelect, starred } = props;
+  const { map, handleStarClick, onSelect, starred } = props;
   const router = useRouter();
   return (
-    <Card key={endpoint + map.id} sx={{ my: 2 }} variant='outlined'>
-      <CardHeader
-        sx={{ paddingBottom: 0 }}
-        title={map.name}
-        subheader={`创建者 ${map.creator} ${new Date(
-          map.createdAt
-        ).toLocaleDateString()}`}
-        action={
-          <Button
-            color={starred ? 'warning' : 'inherit'}
-            onClick={() => handleStarClick(map.id)}
-          >
-            {starred ? <StarRoundedIcon /> : <StarBorderRoundedIcon />}
-            <Typography variant='body2' sx={{ ml: 1 }}>
-              {map.starCount}
-            </Typography>
-          </Button>
-        }
-      />
-      <CardContent>
-        <Box display='flex' alignItems='center' justifyContent='space-between'>
-          <Box display='flex' alignItems='center'>
-            <VisibilityIcon />
-            <Typography variant='body2' sx={{ ml: 1 }}>
-              {map.views}
-            </Typography>
-          </Box>
-          <Box display='flex' alignItems='center'>
-            <AspectRatioRounded sx={{ ml: 1 }} />
-            <Typography variant='body2' sx={{ ml: 1 }}>
-              {map.width} x {map.height}
-            </Typography>
-          </Box>
-        </Box>
-        <Typography
-          variant='body2'
-          color='text.secondary'
-          sx={{
-            display: '-webkit-box',
-            WebkitLineClamp: 2,
-            WebkitBoxOrient: 'vertical',
-            overflow: 'hidden',
-            textOverflow: 'ellipsis',
-          }}
+    <article className="rounded-xl border-2 border-border-main bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:shadow-lg">
+      <header className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h3 className="text-lg font-semibold text-text-primary">{map.name}</h3>
+          <p className="text-xs text-text-muted">
+            创建者 {map.creator} · {new Date(map.createdAt).toLocaleDateString()}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => handleStarClick(map.id)}
+          className={clsx(
+            'inline-flex items-center gap-2 rounded-full border-2 px-3 py-1 text-sm font-medium transition-all',
+            starred
+              ? 'border-player-4 bg-player-4 text-white'
+              : 'border-border-main bg-bg-light text-text-primary hover:border-player-4 hover:text-player-4',
+          )}
         >
-          {map.description}
-        </Typography>
-      </CardContent>
-      <CardActions>
-        <Button
-          variant='contained'
-          color='primary'
+          {starred ? <StarSolidIcon className="h-5 w-5" /> : <StarIcon className="h-5 w-5" />}
+          <span>{map.starCount}</span>
+        </button>
+      </header>
+
+      <div className="mt-4 flex items-center justify-between text-sm text-text-muted">
+        <span className="inline-flex items-center gap-1">
+          <EyeIcon className="h-4 w-4" />
+          {map.views}
+        </span>
+        <span className="inline-flex items-center gap-1">
+          <AspectRatioIcon className="h-4 w-4" />
+          {map.width} × {map.height}
+        </span>
+      </div>
+
+      <p
+        className="mt-3 text-sm text-text-muted"
+        style={{
+          display: '-webkit-box',
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: 'vertical',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+        }}
+      >
+        {map.description}
+      </p>
+
+      <div className="mt-4 flex flex-col gap-2 md:flex-row">
+        <button
+          type="button"
+          className="btn-secondary flex-1 justify-center"
           onClick={() => router.push(`/maps/${map.id}`)}
-          sx={{ margin: 1, width: '100%' }}
         >
           查看地图
-        </Button>
+        </button>
         {onSelect && (
-          <Button
-            variant='contained'
-            color='primary'
-            onClick={() => {
-              onSelect(map.id);
-            }}
-            sx={{ margin: 1, width: '100%' }}
+          <button
+            type="button"
+            className="btn-primary flex-1 justify-center"
+            onClick={() => onSelect(map.id)}
           >
             选择地图
-          </Button>
+          </button>
         )}
-      </CardActions>
-    </Card>
+      </div>
+    </article>
   );
 });
 
@@ -110,6 +95,9 @@ interface MapExplorerProps {
   userId: string;
   onSelect?: (mapId: string) => void;
 }
+
+const tabLabels = ['最新', '最热', '最佳', '搜索'];
+const endpoints = ['new', 'hot', 'best', 'search'];
 
 export default function MapExplorer({ userId, onSelect }: MapExplorerProps) {
   const [tabIndex, setTabIndex] = useState(1);
@@ -142,10 +130,9 @@ export default function MapExplorer({ userId, onSelect }: MapExplorerProps) {
 
   useEffect(() => {
     const fetchMaps = async () => {
-      const endpoint = ['new', 'hot', 'best', 'search'][tabIndex];
-      const url = `${process.env.NEXT_PUBLIC_SERVER_API}/${endpoint}${
-        tabIndex === 3 ? `?q=${searchTerm}` : ''
-      }`;
+      const endpoint = endpoints[tabIndex];
+      const query = tabIndex === 3 && searchTerm ? `?q=${encodeURIComponent(searchTerm)}` : '';
+      const url = `${process.env.NEXT_PUBLIC_SERVER_API}/${endpoint}${query}`;
       const response = await fetch(url);
       const data = await response.json();
       setMaps(data);
@@ -194,60 +181,63 @@ export default function MapExplorer({ userId, onSelect }: MapExplorerProps) {
         console.log('star error', error);
       }
     },
-    [starredMaps, setMaps, setStarredMaps]
+    [starredMaps, setMaps, setStarredMaps, userId]
   );
 
-  const handleTabChange = (event: any, newValue: any) => {
-    setTabIndex(newValue);
-  };
-
-  const handleSearchChange = (event: any) => {
-    setSearchTerm(event.target.value);
-  };
-
   return (
-    <Box>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
-        <Tabs
-          value={tabIndex}
-          onChange={handleTabChange}
-          aria-label='basic tabs example'
-        >
-          <Tab label='最新' />
-          <Tab label='最热' />
-          <Tab label='最佳' />
-          <Tab label='搜索' />
-        </Tabs>
-      </Box>
+    <div className="space-y-4">
+      <div className="flex gap-2 border-b-2 border-border-subtle">
+        {tabLabels.map((label, index) => (
+          <button
+            key={label}
+            type="button"
+            onClick={() => setTabIndex(index)}
+            className={clsx(
+              'px-3 py-2 text-sm font-medium transition-all',
+              tabIndex === index
+                ? 'border-b-2 border-text-primary text-text-primary'
+                : 'border-b-2 border-transparent text-text-muted hover:text-text-primary',
+            )}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
       {tabIndex === 3 && (
-        <TextField
-          sx={{ width: '100%', mt: 2 }}
-          size='small'
-          label='Search'
-          value={searchTerm}
-          onChange={handleSearchChange}
-          inputProps={
-            <InputAdornment position='start'>
-              <SearchRounded color='primary' />
-            </InputAdornment>
-          }
-        />
+        <div className="relative">
+          <SearchIcon className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-text-muted" />
+          <input
+            type="search"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+            placeholder="搜索地图..."
+            className="w-full rounded-md border-2 border-border-main bg-white px-9 py-2 text-sm text-text-primary focus:border-text-primary focus:outline-none focus:ring-2 focus:ring-text-primary/15"
+          />
+        </div>
       )}
 
-      <Box sx={{ height: '500px', overflow: 'auto' }}>
-        {maps &&
-          maps.map((map) => (
-            // <Card className='menu-container' key={map.id} sx={{ my: 2 }}>
-            <ListItem
-              key={map.id}
-              endpoint={['new', 'hot', 'best', 'search'][tabIndex]}
-              map={map}
-              handleStarClick={handleStarClick}
-              onSelect={onSelect}
-              starred={starredMaps[map.id]}
-            />
-          ))}
-      </Box>
-    </Box>
+      <div className="max-h-[500px] space-y-3 overflow-y-auto pr-1">
+        {maps?.map((map) => (
+          <ListItem
+            key={map.id}
+            map={map}
+            handleStarClick={handleStarClick}
+            onSelect={onSelect}
+            starred={Boolean(starredMaps[map.id])}
+          />
+        ))}
+        {!maps && (
+          <div className="rounded-lg border-2 border-border-main bg-bg-light px-4 py-6 text-center text-sm text-text-muted">
+            正在加载地图...
+          </div>
+        )}
+        {maps && maps.length === 0 && (
+          <div className="rounded-lg border-2 border-border-main bg-bg-light px-4 py-6 text-center text-sm text-text-muted">
+            暂无地图结果
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

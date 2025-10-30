@@ -4,7 +4,7 @@ import { io } from 'socket.io-client';
 import ChatBox from '@/components/ChatBox';
 import Navbar from '@/components/Navbar';
 
-import { Snackbar, Alert, AlertTitle } from '@mui/material';
+import Toast from '@/components/ui/Toast';
 
 import {
   Room,
@@ -56,6 +56,11 @@ function GamingRoom() {
     setTeam,
     setMyUserName,
   } = useGameDispatch();
+  const roomRef = useRef(room);
+
+  useEffect(() => {
+    roomRef.current = room;
+  }, [room]);
 
   useEffect(() => {
     let tmp: string | null = localStorage.getItem('username');
@@ -349,7 +354,7 @@ function GamingRoom() {
 
     socket.on('reconnect', () => {
       console.log('Reconnected to server.');
-      if (room.gameStarted && myPlayerIdRef.current) {
+      if (roomRef.current?.gameStarted && myPlayerIdRef.current) {
         socket.emit('reconnect', myPlayerIdRef.current);
       } else {
         socket.emit('get_room_info');
@@ -357,9 +362,28 @@ function GamingRoom() {
     });
 
     return () => {
-      socketRef.current.disconnect();
+      socketRef.current?.disconnect();
     };
-  }, [roomId, myUserName]);
+  }, [
+    roomId,
+    myUserName,
+    attackQueueRef,
+    mapQueueDataDispatch,
+    mapDataDispatch,
+    roomDispatch,
+    setDialogContent,
+    setInitGameInfo,
+    setIsSurrendered,
+    setLeaderBoardData,
+    setOpenOverDialog,
+    setRoomUiStatus,
+    setSelectedMapTileInfo,
+    setTurnsCount,
+    snackStateDispatch,
+    setTeam,
+    setMyPlayerId,
+    socketRef,
+  ]);
 
   useEffect(() => {
     if (room.gameStarted && roomUiStatus === RoomUiStatus.gameSetting) {
@@ -369,18 +393,19 @@ function GamingRoom() {
 
   return (
     <div className='app-container'>
-      <Snackbar
+      <Toast
         open={snackState.open}
-        autoHideDuration={snackState.duration}
+        title={snackState.title}
+        message={snackState.message}
+        type={snackState.status}
+        duration={snackState.duration}
         onClose={() => {
-          snackStateDispatch({ type: 'toggle' });
+          snackStateDispatch({
+            type: 'toggle',
+            duration: snackState.duration ?? null,
+          });
         }}
-      >
-        <Alert severity={snackState.status} sx={{ width: '100%' }}>
-          <AlertTitle>{snackState.title}</AlertTitle>
-          {snackState.message}
-        </Alert>
-      </Snackbar>
+      />
       {roomUiStatus === RoomUiStatus.gameSetting && (
         <div>
           <Navbar />

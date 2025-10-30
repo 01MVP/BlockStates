@@ -7,23 +7,14 @@ import React, {
   useReducer,
 } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import {
-  Box,
-  Slider,
-  IconButton,
-  Radio,
-  RadioGroup,
-  Typography,
-  TextField,
-  FormControlLabel,
-} from '@mui/material';
+import clsx from 'classnames';
 
 import {
-  FastRewindRounded,
-  PlayArrowRounded,
-  PauseRounded,
-  FastForwardRounded,
-} from '@mui/icons-material';
+  RewindIcon,
+  PlayIcon,
+  PauseIcon,
+  FastForwardIcon,
+} from '@/components/ui/icons';
 import { mapDataReducer } from '@/context/GameReducer';
 import CustomMapTile from '@/components/game/CustomMapTile';
 import { ReplaySpeedOptions } from '@/lib/constants';
@@ -58,6 +49,7 @@ export default function GameReplay(props: any) {
   const [notFoundError, setNotFoundError] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const intervalId = useRef<any>(undefined);
+  const turnsCountRef = useRef(turnsCount);
 
   const {
     tileSize,
@@ -77,15 +69,11 @@ export default function GameReplay(props: any) {
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
       handleZoomOption(event.key);
-      switch (event.key) {
-        case ' ': // black space
-          setIsPlay(!isPlay);
-          break;
-        default:
-          break;
+      if (event.key === ' ') {
+        setIsPlay((prev) => !prev);
       }
     },
-    [isPlay, mapWidth]
+    [handleZoomOption]
   );
 
   useEffect(() => {
@@ -120,6 +108,7 @@ export default function GameReplay(props: any) {
         const { turn, data, lead } = game_record.gameRecordTurns[0];
         mapDataDispatch({ type: 'update', mapDiff: data });
         setLeaderBoardData(lead);
+        turnsCountRef.current = turn ?? 1;
       } catch (error) {
         console.error(error);
         setNotFoundError('Replay not found');
@@ -130,36 +119,55 @@ export default function GameReplay(props: any) {
   }, [replayId]);
 
   useEffect(() => {
-    if (gameRecord) {
-      let tmp_turn = turnsCount;
-      if (!tmp_turn) tmp_turn = 1;
+    if (!gameRecord) return;
 
-      const updateTurn = () => {
-        if (tmp_turn > gameRecord.gameRecordTurns.length) {
-          clearInterval(intervalId.current);
-          setIsPlay(false);
-          return;
-        }
-        const { turn, data, lead } = gameRecord.gameRecordTurns[tmp_turn - 1];
-        mapDataDispatch({ type: 'update', mapDiff: data });
-        setLeaderBoardData(lead);
-        setTurnsCount(tmp_turn);
-        setMessages(
-          gameRecord.messagesRecord.filter((message) => {
-            if (message.turn) return message.turn <= tmp_turn;
-            else return true;
-          })
-        );
-
-        tmp_turn++;
-      };
-      if (isPlay) {
-        intervalId.current = setInterval(updateTurn, 500 / playSpeed);
-      } else {
-        clearInterval(intervalId.current);
-      }
+    if (!turnsCountRef.current) {
+      turnsCountRef.current = 1;
     }
-  }, [gameRecord, isPlay, playSpeed]); // don't add turnsCount
+
+    const updateTurn = () => {
+      const nextTurn = turnsCountRef.current ?? 1;
+      if (nextTurn > gameRecord.gameRecordTurns.length) {
+        clearInterval(intervalId.current);
+        intervalId.current = undefined;
+        turnsCountRef.current = gameRecord.gameRecordTurns.length;
+        setIsPlay(false);
+        return;
+      }
+      const { data, lead } = gameRecord.gameRecordTurns[nextTurn - 1];
+      mapDataDispatch({ type: 'update', mapDiff: data });
+      setLeaderBoardData(lead);
+      setTurnsCount(nextTurn);
+      setMessages(
+        gameRecord.messagesRecord.filter((message) => {
+          if (message.turn) return message.turn <= nextTurn;
+          return true;
+        })
+      );
+      turnsCountRef.current = nextTurn + 1;
+    };
+
+    clearInterval(intervalId.current);
+    intervalId.current = undefined;
+
+    if (isPlay) {
+      intervalId.current = setInterval(updateTurn, 500 / playSpeed);
+    }
+
+    return () => {
+      clearInterval(intervalId.current);
+      intervalId.current = undefined;
+    };
+  }, [
+    gameRecord,
+    isPlay,
+    playSpeed,
+    mapDataDispatch,
+    setLeaderBoardData,
+    setTurnsCount,
+    setMessages,
+    setIsPlay,
+  ]);
 
   useEffect(() => {
     if (checkedPlayers && checkedPlayers.length > 0) {
@@ -213,8 +221,10 @@ export default function GameReplay(props: any) {
 
       setIsPlay(false);
       clearInterval(intervalId.current);
+      intervalId.current = undefined;
 
       setTurnsCount(current_turn);
+      turnsCountRef.current = current_turn;
 
       setMessages(
         gameRecord.messagesRecord.filter((message) => {
@@ -235,194 +245,132 @@ export default function GameReplay(props: any) {
   };
 
   const handleChangeTurn = (event: any) => {
-    changeTurn(event.target.value as number);
+    changeTurn(Number(event.target.value));
   };
 
   if (notFoundError) {
     return (
-      <div className='menu-container'>
-        <Typography variant='h4'>回放未找到</Typography>
+      <div className="menu-container mx-auto mt-20 max-w-md p-6 text-center text-text-primary">
+        <p className="text-xl font-semibold">回放未找到</p>
       </div>
     );
   }
 
   if (!gameRecord) {
     return (
-      <div className='center-layout'>
+      <div className="center-layout">
         <GameLoading />
       </div>
     );
-  } else {
-    return (
-      <Box className='app-container'>
-        <Box className='Game'>
-          {/* Replay Control Menu */}
-          <Box
-            className='menu-container'
-            sx={{
-              margin: 0,
-              padding: '5px',
-              position: 'absolute',
-              left: '50%',
-              transform: 'translate(-50%, 0) translate(0, 0)',
-              width: 'max-content',
-              height: 'min-content',
-              bottom: { xs: '5px', md: '20px' },
-              display: 'flex',
-              justifyContent: 'center',
-              alignItems: 'center',
-              flexDirection: 'column',
-              zIndex: 1002,
-              boxShadow: '2',
-            }}
-          >
-            <Box
-              display='flex'
-              flexDirection='row'
-              justifyContent='space-between'
-              sx={{
-                marginBottom: {
-                  xs: '-8px',
-                  md: '10px',
-                },
-              }}
-            >
-              <IconButton
-                size='small'
-                disabled={turnsCount === 1}
-                onClick={() => changeTurn(turnsCount > 1 ? turnsCount - 1 : 1)}
-              >
-                <FastRewindRounded fontSize='large' />
-              </IconButton>
-              <IconButton size='small' onClick={() => setIsPlay(!isPlay)}>
-                {isPlay ? (
-                  <PauseRounded fontSize='large' />
-                ) : (
-                  <PlayArrowRounded fontSize='large' />
-                )}
-              </IconButton>
-              <IconButton
-                size='small'
-                disabled={turnsCount === maxTurn}
-                onClick={() =>
-                  changeTurn(turnsCount < maxTurn ? turnsCount + 1 : maxTurn)
-                }
-              >
-                <FastForwardRounded fontSize='large' />
-              </IconButton>
-            </Box>
-            <Slider
-              size='small'
-              value={turnsCount}
-              min={0}
-              step={1}
-              max={maxTurn}
-              onChange={handleChangeTurn}
-              sx={{
-                color: '#fff',
-                padding: '4px 0px',
-                height: 6,
-                '& .MuiSlider-thumb': {
-                  width: 16,
-                  height: 16,
-                  transition: '0.3s cubic-bezier(.47,1.64,.41,.8)',
-                  '&:before': {
-                    boxShadow: '0 2px 12px 0 rgba(0,0,0,0.4)',
-                  },
-                  '&:hover, &.Mui-focusVisible': {
-                    boxShadow: `0px 0px 0px 8px rgb(255 255 255 / 16%)`,
-                  },
-                  '&.Mui-active': {
-                    width: 26,
-                    height: 26,
-                  },
-                },
-                '& .MuiSlider-rail': {
-                  opacity: 0.28,
-                },
-              }}
-            />
-            <RadioGroup
-              sx={{
-                width: '100%',
-                display: 'flex',
-                flexDirection: 'row',
-                justifyContent: 'center',
-                alignItems: 'center',
-                marginTop: {
-                  xs: '-8px',
-                  md: '10px',
-                },
-              }}
-              aria-label='game-speed'
-              name='game-speed'
-              value={playSpeed}
-              row
-              onChange={(event) => {
-                setIsPlay(false);
-                setPlaySpeed(Number.parseFloat(event.target.value));
-              }}
-            >
-              {ReplaySpeedOptions.map((value) => (
-                <FormControlLabel
-                  sx={{
-                    marginX: {
-                      xs: '1px',
-                      md: '3px',
-                    },
-                  }}
-                  key={value}
-                  value={value}
-                  control={<Radio size='small' />}
-                  label={<Typography color='white'>{`${value}x`}</Typography>}
-                />
-              ))}
-            </RadioGroup>
-          </Box>
-
-          <TurnsCount
-            count={turnsCount}
-            handleReturnClick={() => {
-              router.push('/');
-            }}
-          />
-
-          <LeaderBoard
-            leaderBoardTable={leaderBoardData}
-            players={gameRecord.players}
-            checkedPlayers={checkedPlayers}
-            setCheckedPlayers={setCheckedPlayers}
-          />
-          <ChatBox socket={null} messages={messages} />
-          <div
-            ref={mapRef}
-            tabIndex={0}
-            style={{
-              position: 'absolute',
-              top: '50%',
-              left: '50%',
-              transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px)`,
-              width: mapPixelHeight, // game's width and height are swapped
-              height: mapPixelWidth,
-            }}
-          >
-            {limitedView.map((tiles, x) => {
-              return tiles.map((tile, y) => {
-                return (
-                  <CustomMapTile
-                    key={`${x}/${y}`}
-                    zoom={zoom}
-                    size={tileSize}
-                    x={x}
-                    y={y}
-                    tile={[...tile, false, 0]}
-                  />
-                );
-              });
-            })}
-          </div>
-        </Box>
-      </Box>
-    );
   }
+
+  return (
+    <div className="app-container">
+      <div className="Game">
+        <div className="menu-container absolute left-1/2 bottom-5 z-[1002] flex w-[90vw] max-w-xl -translate-x-1/2 flex-col items-center gap-3 border-2 border-border-main bg-[#212936]/95 px-4 py-3 shadow-lg md:bottom-6">
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              className="icon-btn"
+              title="上一回合"
+              disabled={turnsCount === 1}
+              onClick={() => changeTurn(turnsCount > 1 ? turnsCount - 1 : 1)}
+            >
+              <RewindIcon />
+            </button>
+            <button
+              type="button"
+              className="icon-btn"
+              title={isPlay ? '暂停' : '播放'}
+              onClick={() => setIsPlay(!isPlay)}
+            >
+              {isPlay ? <PauseIcon /> : <PlayIcon />}
+            </button>
+            <button
+              type="button"
+              className="icon-btn"
+              title="下一回合"
+              disabled={turnsCount === maxTurn}
+              onClick={() => changeTurn(turnsCount < maxTurn ? turnsCount + 1 : maxTurn)}
+            >
+              <FastForwardIcon />
+            </button>
+          </div>
+
+          <input
+            type="range"
+            min={1}
+            max={Math.max(1, maxTurn)}
+            step={1}
+            value={turnsCount}
+            onChange={handleChangeTurn}
+            className="h-2 w-full cursor-pointer appearance-none rounded-full bg-border-subtle accent-text-primary"
+          />
+
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-white">
+            {ReplaySpeedOptions.map((value) => (
+              <button
+                key={value}
+                type="button"
+                className={clsx(
+                  'rounded-full border-2 px-3 py-1 transition-all',
+                  playSpeed === value
+                    ? 'border-text-primary bg-text-primary text-white shadow'
+                    : 'border-white/30 bg-white/10 text-white hover:border-white/70',
+                )}
+                onClick={() => {
+                  setIsPlay(false);
+                  setPlaySpeed(value);
+                }}
+              >
+                {value}x
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <TurnsCount
+          count={turnsCount}
+          handleReturnClick={() => {
+            router.push('/');
+          }}
+        />
+
+        <LeaderBoard
+          leaderBoardTable={leaderBoardData}
+          players={gameRecord.players}
+          checkedPlayers={checkedPlayers}
+          setCheckedPlayers={setCheckedPlayers}
+        />
+
+        <ChatBox socket={null} messages={messages} />
+
+        <div
+          ref={mapRef}
+          tabIndex={0}
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px)`,
+            width: mapPixelHeight,
+            height: mapPixelWidth,
+          }}
+        >
+          {limitedView.map((tiles, x) => {
+            return tiles.map((tile, y) => (
+              <CustomMapTile
+                key={`${x}/${y}`}
+                zoom={zoom}
+                size={tileSize}
+                x={x}
+                y={y}
+                tile={[...tile, false, 0]}
+              />
+            ));
+          })}
+        </div>
+      </div>
+    </div>
+  );
 }

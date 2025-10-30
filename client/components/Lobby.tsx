@@ -1,28 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Paper,
-  Typography,
-  Button,
-  Box,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  Snackbar,
-  Alert,
-  ButtonGroup,
-  CircularProgress,
-} from '@mui/material';
 import { Room, RoomPool } from '@/lib/types';
-import StorageIcon from '@mui/icons-material/Storage';
-import { AddHomeOutlined, MapOutlined } from '@mui/icons-material';
+import Spinner from '@/components/ui/Spinner';
+import Toast from '@/components/ui/Toast';
+import clsx from 'classnames';
 
 function Lobby() {
   const [rooms, setRooms] = useState<RoomPool>({});
@@ -69,9 +50,9 @@ function Lobby() {
     }
   }, [setUsername, router]);
 
-  const handleRoomClick = async (roomName: string) => {
+  const handleRoomClick = (roomName: string) => {
     setJoinLoading(true);
-    await router.push(`/rooms/${roomName}`);
+    router.push(`/rooms/${roomName}`);
   };
 
   const handleCreateRoomClick = async () => {
@@ -96,190 +77,159 @@ function Lobby() {
 
   return (
     <>
-      <Snackbar
+      <Toast
         open={snackOpen}
-        autoHideDuration={1000}
-        onClose={() => {
-          setSnackOpen(!snackOpen);
-        }}
-      >
-        <Alert severity='error' sx={{ width: '100%' }}>
-          {snackMessage}
-        </Alert>
-      </Snackbar>
-      <div className='app-container'>
-        <div className='center-layout'>
-          <Box
-            sx={{
-              width: {
-                xs: '90vw',
-                md: '55vw',
-                lg: '45vw',
-              },
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'column',
-            }}
-          >
-            <Typography
-              variant='h4'
-              component='h1'
-              color='primary'
-              fontWeight='bold'
-              gutterBottom
-              sx={{ padding: '20px' }}
-            >
+        message={snackMessage}
+        type={serverStatus ? 'info' : 'error'}
+        onClose={() => setSnackOpen(false)}
+      />
+
+      <section className="mx-auto flex w-full max-w-5xl flex-col items-center px-4 pb-16 pt-10">
+        <div className="w-full space-y-6">
+          <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
+            <h1 className="text-3xl font-semibold text-text-primary">
               欢迎你，{username}
-            </Typography>
-            <List className='menu-container' sx={{ width: '100%' }}>
-              <ListItem>
-                <ListItemIcon>
-                  <StorageIcon />
-                </ListItemIcon>
-                <ListItemText
-                  id='block-empire-server'
-                  primary={
-                    <Typography color='primary'>方块帝国后端服务器</Typography>
-                  }
-                  secondary={process.env.NEXT_PUBLIC_SERVER_API}
+            </h1>
+            <div className="inline-flex items-center gap-2 rounded-full border-2 border-border-main bg-white px-4 py-2 text-sm text-text-muted shadow-sm">
+              <span className="font-medium text-text-primary">
+                实时刷新中
+              </span>
+              <span className="relative flex h-3 w-3">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-player-2 opacity-75" />
+                <span className="relative inline-flex h-3 w-3 rounded-full bg-player-2" />
+              </span>
+            </div>
+          </div>
+
+          <div className="card w-full">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div>
+                <p className="text-sm font-medium text-text-primary">
+                  方块帝国后端服务器
+                </p>
+                <p className="text-xs text-text-muted">
+                  {process.env.NEXT_PUBLIC_SERVER_API}
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={clsx(
+                    'inline-flex h-3 w-3 rounded-full',
+                    serverStatus ? 'bg-player-3' : 'bg-player-1',
+                  )}
                 />
-                <Box sx={{ position: 'relative', right: 0 }}>
-                  <Box
-                    component='span'
-                    sx={{
-                      bgcolor: serverStatus ? 'lightgreen' : 'red',
-                      width: '0.7em',
-                      height: '0.7em',
-                      borderRadius: '50%',
-                      display: 'inline-block',
-                      marginRight: 1,
-                    }}
-                  />
-                  <Typography fontSize='0.9rem' color='white' sx={{ display: 'inline' }}>
-                    {serverStatus ? '在线' : '离线'}
-                  </Typography>
-                </Box>
-              </ListItem>
-            </List>
-            <TableContainer
-              className='menu-container'
-              component={Paper}
-              sx={{
-                maxHeight: '50vh',
-                boxShadow: 'unset',
-              }}
-            >
-              <Table
-                size='medium'
-                sx={{
-                  '& .MuiTableCell-root': {
-                    fontSize: '1rem',
-                  },
-                }}
-              >
-                <TableHead>
-                  <TableRow>
-                    {/* <TableCell></TableCell> */}
-                    {/* <TableCell>房间号</TableCell> */}
-                    <TableCell>房间名</TableCell>
-                    <TableCell align='center'>速度</TableCell>
-                    <TableCell align='center'>玩家列表</TableCell>
-                    <TableCell align='center'>状态</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
+                <span className="text-sm font-medium text-text-primary">
+                  {serverStatus ? '在线' : '离线'}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div className="card w-full overflow-hidden p-0">
+            <div className="flex items-center justify-between border-b-2 border-border-main bg-bg-main px-6 py-4">
+              <h2 className="text-lg font-medium text-text-primary">房间列表</h2>
+              <span className="text-sm text-text-muted">
+                {loading
+                  ? '加载中…'
+                  : `共 ${Object.keys(rooms).length} 个房间`}
+              </span>
+            </div>
+            <div className="max-h-[55vh] overflow-y-auto">
+              <table className="min-w-full divide-y-2 divide-border-subtle text-left">
+                <thead className="bg-bg-main text-xs uppercase tracking-wide text-text-muted">
+                  <tr>
+                    <th className="px-6 py-3 font-medium">房间名</th>
+                    <th className="px-6 py-3 text-center font-medium">
+                      速度
+                    </th>
+                    <th className="px-6 py-3 text-center font-medium">
+                      玩家
+                    </th>
+                    <th className="px-6 py-3 text-center font-medium">
+                      状态
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border-subtle bg-white text-sm">
                   {joinLoading && (
-                    <TableRow>
-                      <TableCell colSpan={6} align='center'>
-                        <Typography variant='h6'>
-                          加入房间中...
-                        </Typography>
-                        <CircularProgress />
-                      </TableCell>
-                    </TableRow>
+                    <tr>
+                      <td colSpan={4} className="px-6 py-6 text-center">
+                        <div className="flex flex-col items-center gap-3 text-sm text-text-muted">
+                          <Spinner size="md" />
+                          <span className="font-medium text-text-primary">
+                            加入房间中...
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
                   )}
                   {loading ? (
-                    <TableRow>
-                      <TableCell colSpan={6} align='center'>
-                        <CircularProgress />
-                      </TableCell>
-                    </TableRow>
+                    <tr>
+                      <td colSpan={4} className="px-6 py-6 text-center">
+                        <Spinner size="lg" />
+                      </td>
+                    </tr>
                   ) : Object.keys(rooms).length === 0 ? (
-                    <TableRow>
-                      <TableCell colSpan={6} align='center'>
-                        暂无房间
-                      </TableCell>
-                    </TableRow>
+                    <tr>
+                      <td
+                        colSpan={4}
+                        className="px-6 py-6 text-center text-text-muted"
+                      >
+                        暂无房间，快来创建第一个房间吧！
+                      </td>
+                    </tr>
                   ) : (
                     Object.values(rooms).map((room: Room) => (
-                      <TableRow
-                        hover
+                      <tr
                         key={room.id}
                         onClick={() => handleRoomClick(room.id)}
-                        sx={{
-                          cursor: 'pointer',
-                        }}
+                        className="cursor-pointer transition hover:bg-bg-main/60"
                       >
-                        <TableCell
-                          sx={{
-                            whiteSpace: 'nowrap',
-                            maxWidth: '20vw',
-                            overflowX: 'hidden',
-                          }}
-                        >
+                        <td className="max-w-[200px] truncate px-6 py-4 font-medium text-text-primary">
                           {room.roomName}
-                        </TableCell>
-                        <TableCell align='center'>{room.gameSpeed}</TableCell>
-                        <TableCell align='center'>{`${room.players.length}/${room.maxPlayers}`}</TableCell>
-                        <TableCell align='center'>
-                          <Typography
-                            variant='body2'
-                            color={room.gameStarted ? 'yellow' : 'lightgreen'}
+                        </td>
+                        <td className="px-6 py-4 text-center text-text-secondary">
+                          {room.gameSpeed}
+                        </td>
+                        <td className="px-6 py-4 text-center text-text-secondary">
+                          {`${room.players.length}/${room.maxPlayers}`}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <span
+                            className={clsx(
+                              'game-status',
+                              room.gameStarted ? 'playing' : 'waiting',
+                            )}
                           >
                             {room.gameStarted ? '已开始' : '等待中'}
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
+                          </span>
+                        </td>
+                      </tr>
                     ))
                   )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <Button
-              variant='contained'
-              color='primary'
-              startIcon={<AddHomeOutlined />}
-              sx={{
-                marginTop: 2,
-                width: '100%',
-                height: '60px',
-                fontSize: '20px',
-                whiteSpace: 'nowrap',
-              }}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="grid w-full gap-4 md:grid-cols-2">
+            <button
+              type="button"
+              className="btn-primary flex w-full items-center justify-center gap-2"
               onClick={handleCreateRoomClick}
             >
               创建房间
-            </Button>
-            <Button
-              variant='contained'
-              color='secondary'
-              startIcon={<MapOutlined />}
-              sx={{
-                marginTop: 2,
-                width: '100%',
-                height: '60px',
-                fontSize: '20px',
-                whiteSpace: 'nowrap',
-              }}
-              onClick={() => {
-                router.push('/mapcreator');
-              }}
+            </button>
+            <button
+              type="button"
+              className="btn-secondary flex w-full items-center justify-center gap-2"
+              onClick={() => router.push('/mapcreator')}
             >
-              创建地图PC
-            </Button>
-          </Box>
+              创建地图（PC）
+            </button>
+          </div>
         </div>
-      </div>
+      </section>
     </>
   );
 }

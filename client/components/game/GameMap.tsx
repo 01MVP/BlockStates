@@ -3,19 +3,21 @@ import useMap from '@/hooks/useMap';
 import { Position, SelectedMapTileInfo, TileProp, TileType } from '@/lib/types';
 import usePossibleNextMapPositions from '@/lib/use-possible-next-map-positions';
 import { getPlayerIndex } from '@/lib/utils';
-import { ZoomInMap, ZoomOutMap } from '@mui/icons-material';
-import ArrowBackIcon from '@mui/icons-material/ArrowBack';
-import ArrowDownwardIcon from '@mui/icons-material/ArrowDownward';
-import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
-import ArrowUpwardIcon from '@mui/icons-material/ArrowUpward';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ClearIcon from '@mui/icons-material/Clear';
-import HomeIcon from '@mui/icons-material/Home';
-import UndoIcon from '@mui/icons-material/Undo';
-import { Box, IconButton, Tooltip, Typography } from '@mui/material';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import {
+  ZoomInIcon,
+  ZoomOutIcon,
+  ArrowLeftIcon,
+  ArrowRightIcon,
+  ArrowUpIcon,
+  ArrowDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  CloseIcon,
+  HomeIcon,
+  UndoIcon,
+} from '@/components/ui/icons';
 import { MutableRefObject, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import MapTile from './MapTile';
 function GameMap() {
   const {
@@ -331,7 +333,7 @@ function GameMap() {
       mapNode.focus(); // 只在地图初始化的时候自动 focus 一次
     }
     return () => { };
-  }, []);
+  }, [mapRef]);
 
   useEffect(() => {
     const mapNode = mapRef.current;
@@ -393,111 +395,81 @@ function GameMap() {
         })}
       </div>
       {isSmallScreen && (
-        <Box
-          className='menu-container'
-          sx={{
-            margin: 0,
-            padding: '1px !important',
-            position: 'absolute',
-            left: '5px',
-            bottom: { xs: '65px', md: '80px' },
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignContent: 'space-between',
-            alignItems: 'center',
-            flexDirection: 'column',
-            zIndex: 1000,
-            boxShadow: '2',
-          }}
-        >
-          <Tooltip title="聚焦将军" placement='top'>
-            <IconButton onClick={centerGeneral}>
-              <HomeIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="撤销移动" placement='top'>
-            <IconButton onClick={popQueue}>
-              <UndoIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="清除队列中的移动" placement='top'>
-            <IconButton onClick={clearQueue}>
-              <ClearIcon />
-            </IconButton>
-          </Tooltip>
-          <Tooltip title="切换50%" placement='top'>
-            <IconButton onClick={() => halfArmy(touchHalf)}>
-              <Typography variant='body2'>50%</Typography>
-            </IconButton>
-          </Tooltip>
-          <IconButton
+        <div className="menu-container absolute left-1 bottom-16 z-[1000] flex flex-col items-center gap-2 p-1 shadow-lg md:bottom-20">
+          <button type="button" className="icon-btn" title="聚焦将军" onClick={centerGeneral}>
+            <HomeIcon />
+          </button>
+          <button type="button" className="icon-btn" title="撤销移动" onClick={popQueue}>
+            <UndoIcon />
+          </button>
+          <button type="button" className="icon-btn" title="清除队列中的移动" onClick={clearQueue}>
+            <CloseIcon />
+          </button>
+          <button type="button" className="icon-btn" title="切换 50%" onClick={() => halfArmy(touchHalf)}>
+            <span className="text-xs font-semibold text-text-primary">50%</span>
+          </button>
+          <button
+            type="button"
+            className="icon-btn"
+            title="缩小"
             onClick={() => {
               setZoom((z) => z - 0.2);
             }}
           >
-            <ZoomInMap />
-          </IconButton>
-          <IconButton
+            <ZoomInIcon />
+          </button>
+          <button
+            type="button"
+            className="icon-btn"
+            title="放大"
             onClick={() => {
               setZoom((z) => z + 0.2);
             }}
           >
-            <ZoomOutMap />
-          </IconButton>
-          <Tooltip title="展开WSAD" placement='top'>
-            <IconButton onClick={toggleDirections}>
-              {showDirections ? <ChevronLeftIcon /> : <ChevronRightIcon />}
-            </IconButton>
-          </Tooltip>
-        </Box>
+            <ZoomOutIcon />
+          </button>
+          <button type="button" className="icon-btn" title="展开 WSAD" onClick={toggleDirections}>
+            {showDirections ? <ChevronLeftIcon /> : <ChevronRightIcon />}
+          </button>
+        </div>
       )}
       {showDirections && (
-        <Box
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            padding: '5px',
-            position: 'absolute',
-            right: '10px',
-            bottom: { xs: '65px', md: '80px' },
-            zIndex: 1000,
-          }}
-        >
-          <Box
-            sx={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-            }}
+        <div className="absolute right-2 bottom-16 z-[1000] flex flex-col items-center gap-2 p-1 md:bottom-20">
+          <button
+            type="button"
+            className="attack-button text-white"
+            onClick={() => attackUp(selectedMapTileInfo)}
+            title="向上进攻"
           >
-            <IconButton onClick={() => attackUp(selectedMapTileInfo)} className='attack-button'>
-              <ArrowUpwardIcon />
-            </IconButton>
-            <Box
-              sx={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                width: {
-                  xs: '40vw',
-                  md: '20vw',
-                  lg: '20vw',
-                },
-                justifyContent: 'space-between',
-              }}
+            <ArrowUpIcon />
+          </button>
+          <div className="flex w-[40vw] items-center justify-between md:w-[20vw]">
+            <button
+              type="button"
+              className="attack-button text-white"
+              onClick={() => attackLeft(selectedMapTileInfo)}
+              title="向左进攻"
             >
-              <IconButton onClick={() => attackLeft(selectedMapTileInfo)} className='attack-button'>
-                <ArrowBackIcon />
-              </IconButton>
-              <IconButton onClick={() => attackRight(selectedMapTileInfo)} className='attack-button'>
-                <ArrowForwardIcon />
-              </IconButton>
-            </Box>
-            <IconButton onClick={() => attackDown(selectedMapTileInfo)} className='attack-button'>
-              <ArrowDownwardIcon />
-            </IconButton>
-          </Box>
-        </Box>
+              <ArrowLeftIcon />
+            </button>
+            <button
+              type="button"
+              className="attack-button text-white"
+              onClick={() => attackRight(selectedMapTileInfo)}
+              title="向右进攻"
+            >
+              <ArrowRightIcon />
+            </button>
+          </div>
+          <button
+            type="button"
+            className="attack-button text-white"
+            onClick={() => attackDown(selectedMapTileInfo)}
+            title="向下进攻"
+          >
+            <ArrowDownIcon />
+          </button>
+        </div>
       )}
     </div>
   );

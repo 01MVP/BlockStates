@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from 'react';
-import useMediaQuery from '@mui/material/useMediaQuery';
+import useMediaQuery from '@/hooks/useMediaQuery';
 import useMapDrag from './useMapDrag';
 
 interface Position {

@@ -1,248 +1,169 @@
-import AppBar from '@mui/material/AppBar';
-import Box from '@mui/material/Box';
-import IconButton from '@mui/material/IconButton';
-import Typography from '@mui/material/Typography';
-import Menu from '@mui/material/Menu';
-import Chip from '@mui/material/Chip';
-import MenuIcon from '@mui/icons-material/Menu';
-import Container from '@mui/material/Container';
-import Button from '@mui/material/Button';
-import MenuItem from '@mui/material/MenuItem';
-import FormControl from '@mui/material/FormControl';
-import Select from '@mui/material/Select';
-
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 import { useRouter, usePathname } from 'next/navigation';
 import Image from 'next/image';
 import HowToPlay from './HowToPlay';
 
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import Link from 'next/link';
-import {
-  BookRounded,
-  FeedbackRounded,
-  Contacts,
-  GitHub,
-  HomeRounded,
-  SmartToyRounded,
-} from '@mui/icons-material';
+import clsx from 'classnames';
+
+type NavItem = {
+  href: string;
+  label: string;
+  external?: boolean;
+};
 
 const navItems = [
-  { href: '/', label: 'home', icon: <HomeRounded /> },
-  { href: 'https://docs.block-empire.com/', label: 'wiki', icon: <BookRounded /> },
+  { href: '/', label: '首页' },
+  { href: 'https://docs.block-empire.com/', label: '文档', external: true },
+  { href: 'https://github.com/01MVP/BlockEmpire', label: 'GitHub', external: true },
   {
     href: 'https://github.com/01MVP/BlockEmpire',
-    label: 'github',
-    icon: <GitHub />,
-  },
-  {
-    href: 'https://github.com/01MVP/BlockEmpire',
-    label: 'bot-api',
-    icon: <SmartToyRounded />,
+    label: '开发机器人',
+    external: true,
   },
   {
     href: 'https://github.com/01MVP/BlockEmpire/issues',
-    label: 'feedback',
-    icon: <FeedbackRounded />,
+    label: '反馈',
+    external: true,
   },
   {
     href: 'http://qm.qq.com/cgi-bin/qm/qr?_wv=1027&k=VAwNA8NiYUMsPHrBxLso-t09saGZCT14&authKey=fFpto%2Ff%2FhNUpcxZhSVZt6msLOZrMhW3e14mypEBlO3Ih7PdqOmXq%2FQ0OlV3D%2BuyO&noverify=0&group_code=374889821',
-    label: 'qq-group',
-    icon: <Contacts />,
+    label: 'QQ群',
+    external: true,
   },
-];
+] as const satisfies readonly NavItem[];
 
 function Navbar() {
-  const [anchorElNav, setAnchorElNav] = useState(null);
-
-  const [show, setShow] = useState(false);
-
-  const toggleShow = () => {
-    setShow(!show);
-  };
-
   const router = useRouter();
   const pathname = usePathname();
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [showHowTo, setShowHowTo] = useState(false);
 
-  const handleClick = (lang: string) => async () => {
-    // Note: In App Router, locale switching needs to be implemented differently
-    // Typically using middleware or Link component with locale prefixes
-    // For now, using simple path-based navigation
-    // You may need to adjust this based on your i18n setup
+  const handleLangChange = (lang: string) => {
     const currentPath = pathname.replace(/^\/(en|zh)/, '');
     router.push(`/${lang}${currentPath}`);
   };
 
-  const handleOpenNavMenu = (event: any) => {
-    setAnchorElNav(event.currentTarget);
-  };
+  const desktopNav = useMemo(
+    () =>
+      navItems.map((item) => {
+        const isActive =
+          item.href !== '/' ? pathname.startsWith(item.href) : pathname === '/';
+        const linkClass = clsx(
+          'inline-flex items-center gap-2 rounded-md border-2 px-4 py-2 text-sm transition-all',
+          isActive
+            ? 'border-text-primary bg-text-primary text-white shadow-md'
+            : 'border-transparent text-text-secondary hover:border-text-primary hover:bg-bg-main',
+        );
 
-  const handleCloseNavMenu = () => {
-    setAnchorElNav(null);
-  };
+        const isExternal = 'external' in item && item.external;
+        const linkProps = isExternal
+          ? { target: '_blank', rel: 'noreferrer noopener' }
+          : {};
+
+        return (
+          <Link key={item.href} href={item.href} {...linkProps} className={linkClass}>
+            {item.label}
+          </Link>
+        );
+      }),
+    [pathname],
+  );
 
   return (
-    <AppBar position='fixed' className='navbar'>
-      <Container className='dock' sx={{ boxShadow: 3 }}>
-        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
-          <IconButton
-            size='large'
-            aria-label='account of current user'
-            aria-controls='menu-appbar'
-            aria-haspopup='true'
-            onClick={handleOpenNavMenu}
-            color='inherit'
+    <header className="sticky top-0 z-sticky border-b-2 border-border-main bg-white/85 backdrop-blur-xl">
+      <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 md:px-8">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-md border-2 border-border-main bg-white text-text-primary hover:bg-bg-main md:hidden"
+            aria-label="切换导航"
+            onClick={() => setMobileOpen((prev) => !prev)}
           >
-            <MenuIcon />
-          </IconButton>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Link
-              href='/'
-              style={{ display: 'flex', alignItems: 'center', flexGrow: 0 }}
-            >
-              <Image
-                src='/img/block-empire-logo.png'
-                width={100}
-                height={17.3}
-                alt='Block Empire logo'
-              />
-            </Link>
-          </Box>
-          <Menu
-            id='menu-appbar'
-            anchorEl={anchorElNav}
-            anchorOrigin={{
-              vertical: 'bottom',
-              horizontal: 'left',
-            }}
-            keepMounted
-            transformOrigin={{
-              vertical: 'top',
-              horizontal: 'left',
-            }}
-            open={Boolean(anchorElNav)}
-            onClose={handleCloseNavMenu}
-            sx={{
-              display: { xs: 'block', md: 'none' },
-            }}
-          >
-            {navItems.map((item) => (
-              <MenuItem key={item.href} onClick={handleCloseNavMenu}>
-                <Link href={item.href}>
-                  <Typography textAlign='center'>
-                    {item.label === 'home' && '首页'}
-                    {item.label === 'wiki' && '文档'}
-                    {item.label === 'github' && 'GitHub'}
-                    {item.label === 'bot-api' && '开发机器人'}
-                    {item.label === 'feedback' && '反馈'}
-                    {item.label === 'qq-group' && 'QQ群'}
-                  </Typography>
-                </Link>
-              </MenuItem>
-            ))}
-          </Menu>
-        </Box>
+            <span className="sr-only">打开菜单</span>
+            <span className="flex h-3 w-6 flex-col justify-between">
+              <span className="block h-[2px] w-6 bg-text-primary" />
+              <span className="block h-[2px] w-6 bg-text-primary" />
+              <span className="block h-[2px] w-6 bg-text-primary" />
+            </span>
+          </button>
+          <Link href="/" className="flex items-center gap-2">
+            <Image
+              src="/img/logo.svg"
+              width={120}
+              height={24}
+              alt="Block Empire"
+              priority
+            />
+          </Link>
+        </div>
 
-        <Box
-          sx={{
-            flexGrow: 1,
-            justifyContent: 'space-between',
-            display: { xs: 'none', md: 'flex' },
-            alignItems: 'center',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <Link
-              href='/'
-              style={{ display: 'flex', alignItems: 'center', flexGrow: 0 }}
-            >
-              <Image
-                src='/img/block-empire-logo.png'
-                width={100}
-                height={17.3}
-                alt='Block Empire logo'
-              />
-            </Link>
-          </Box>
-          <Box>
-            {navItems.map((item) => (
-              <Link href={item.href} key={item.href}>
-                <Button
-                  id='navbar-link'
-                  onClick={handleCloseNavMenu}
-                  sx={{
-                    textTransform: 'none',
-                    fontSize: '1rem',
-                    marginX: '10px',
-                  }}
-                  startIcon={item.icon}
+        <nav className="hidden items-center gap-2 md:flex">{desktopNav}</nav>
+
+        <div className="hidden items-center gap-3 md:flex">
+          <button
+            type="button"
+            className="btn-secondary whitespace-nowrap"
+            onClick={() => setShowHowTo(true)}
+          >
+            游戏教程
+          </button>
+          <select
+            defaultValue="zh"
+            onChange={(event) => handleLangChange(event.target.value)}
+            className="rounded-md border-2 border-border-main bg-white px-3 py-2 text-sm text-text-primary shadow-sm transition hover:border-text-primary focus:border-text-primary focus:outline-none focus:ring-2 focus:ring-text-primary/15"
+          >
+            <option value="zh">中文</option>
+            <option value="en">English</option>
+          </select>
+        </div>
+      </div>
+
+      {mobileOpen && (
+        <div className="border-t-2 border-border-main bg-white/95 px-4 py-4 backdrop-blur md:hidden">
+          <div className="flex flex-col gap-3">
+            {navItems.map((item) => {
+              const isExternal = 'external' in item && item.external;
+              const linkProps = isExternal
+                ? { target: '_blank', rel: 'noreferrer noopener' }
+                : {};
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  {...linkProps}
+                  onClick={() => setMobileOpen(false)}
+                  className="rounded-md border-2 border-border-main bg-bg-light px-3 py-2 text-sm text-text-primary shadow-sm transition hover:bg-bg-main"
                 >
-                  {item.label === 'home' && '首页'}
-                  {item.label === 'wiki' && '文档'}
-                  {item.label === 'github' && 'GitHub'}
-                  {item.label === 'bot-api' && '开发机器人'}
-                  {item.label === 'feedback' && '反馈'}
-                  {item.label === 'qq-group' && 'QQ群'}
-                </Button>
-              </Link>
-            ))}
-          </Box>
-          <Box
-            id='lng-selector'
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              flexDirection: 'row',
-            }}
-          >
-            <Button
-              variant='contained'
-              size='small'
-              onClick={toggleShow}
-              sx={{ margin: 2, height: '40px', fontSize: '15px' }}
+                  {item.label}
+                </Link>
+              );
+            })}
+            <button
+              type="button"
+              className="btn-secondary"
+              onClick={() => {
+                setShowHowTo(true);
+                setMobileOpen(false);
+              }}
             >
-              <Typography variant='body2' sx={{ whiteSpace: 'nowrap' }}>
-                游戏教程
-              </Typography>
-            </Button>
-            <HowToPlay show={show} toggleShow={toggleShow} />
-            <FormControl>
-              <Select
-                color='primary'
-                className='navbar-language-switch'
-                defaultValue={'zh'}
-              >
-                {['en', 'zh'].map((lang) => (
-                  <MenuItem
-                    key={lang}
-                    value={lang}
-                    onClick={handleClick(lang)}
-                  >
-                    <Typography>{lang}</Typography>
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
-        </Box>
+              游戏教程
+            </button>
+            <select
+              defaultValue="zh"
+              onChange={(event) => handleLangChange(event.target.value)}
+              className="rounded-md border-2 border-border-main bg-white px-3 py-2 text-sm text-text-primary shadow-sm transition hover:border-text-primary focus:border-text-primary focus:outline-none focus:ring-2 focus:ring-text-primary/15"
+            >
+              <option value="zh">中文</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+        </div>
+      )}
 
-        {/* 用户界面 todo */}
-        {/* <Box sx={{ flexGrow: 0 }}>
-            <Button
-              id="navbar-link"
-              variant="text"
-              color="primary"
-              sx={{ color: "white" }}
-              onClick={handleOpen}
-            >
-              {" "}
-              {t("navbar-link-clientzone")}{" "}
-              <AccountCircleIcon sx={{ ml: 0.4 }} />
-            </Button>
-          </Box> */}
-      </Container>
-    </AppBar>
+      <HowToPlay show={showHowTo} toggleShow={() => setShowHowTo(false)} />
+    </header>
   );
 }
 export default Navbar;

@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { ThemeProvider } from '@mui/material/styles';
 
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import Login from '../components/Login';
 import Lobby from '../components/Lobby';
-import theme from '../components/theme';
 
 export default function Home() {
   const [username, setUsername] = useState('');
@@ -19,22 +17,25 @@ export default function Home() {
     }
   }, []);
 
-  const handlePlayClick = (username: string) => {
-    setUsername(username);
+  const handlePlayClick = (playerName: string) => {
+    setUsername(playerName);
     if (typeof window !== 'undefined') {
-      localStorage.setItem('username', username);
+      localStorage.setItem('username', playerName);
       localStorage.removeItem('playerId');
     }
   };
 
   return (
-    <ThemeProvider theme={theme}>
+    <div className="flex min-h-screen flex-col">
       <Navbar />
-      {!username && (
-        <Login username={username} handlePlayClick={handlePlayClick} />
-      )}
-      {username && <Lobby />}
+      <main className="flex flex-1 flex-col">
+        {!username ? (
+          <Login username={username} handlePlayClick={handlePlayClick} />
+        ) : (
+          <Lobby />
+        )}
+      </main>
       <Footer />
-    </ThemeProvider>
+    </div>
   );
 }

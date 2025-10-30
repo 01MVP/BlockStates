@@ -7,7 +7,12 @@ export const metadata: Metadata = {
   description: '方块帝国 - 一款基于 Next.js Socket.IO 构建的实时多人策略游戏',
   keywords: '方块帝国, Block Empire, 多人游戏, 策略游戏',
   icons: {
-    icon: '/img/favicon.png',
+    icon: [
+      {
+        url: '/img/favicon.svg',
+        type: 'image/svg+xml',
+      },
+    ],
   },
 };
 
@@ -35,7 +40,9 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body>{children}</body>
+      <body className="font-sans text-text-primary antialiased">
+        {children}
+      </body>
     </html>
   );
 }

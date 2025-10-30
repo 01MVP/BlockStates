@@ -2,16 +2,7 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { UserData, RoomUiStatus } from '@/lib/types';
 import { useGame, useGameDispatch } from '@/context/GameContext';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  Typography,
-} from '@mui/material';
+import Modal from '@/components/ui/Modal';
 
 export default function OverDialog() {
   const { myPlayerId, room, dialogContent, openOverDialog } = useGame();
@@ -66,44 +57,52 @@ export default function OverDialog() {
   };
 
   return (
-    <Dialog
+    <Modal
       open={openOverDialog}
-      onClose={(event: any, reason) => {
-        if (reason === 'backdropClick') return;
-        setOpenOverDialog(false);
-      }}
+      onClose={() => setOpenOverDialog(false)}
+      title={title}
+      disableBackdropClose
+      size="sm"
+      footer={
+        <>
+          <button
+            type="button"
+            className="btn-primary w-full justify-center"
+            onClick={handleBackRoom}
+          >
+            {room.gameStarted ? '观战' : '再玩一次'}
+          </button>
+          {replayLink && (
+            <button
+              type="button"
+              className="btn-secondary w-full justify-center"
+              onClick={handleWatchReplay}
+            >
+              查看回放
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn-secondary w-full justify-center"
+            onClick={handleExit}
+          >
+            返回大厅
+          </button>
+          <button
+            type="button"
+            className="btn-secondary w-full justify-center"
+            onClick={() => setOpenOverDialog(false)}
+          >
+            取消
+          </button>
+        </>
+      }
     >
-      <DialogTitle>{title}</DialogTitle>
-      <DialogContent>{subtitle}</DialogContent>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: '100%',
-        }}
-      >
-        <Button sx={{ width: '100%' }} onClick={handleBackRoom}>
-          {room.gameStarted ? '观战' : '再玩一次'}
-        </Button>
-        {replayLink && (
-          <Button sx={{ width: '100%' }} onClick={handleWatchReplay}>
-            查看回放
-          </Button>
-        )}
-        <Button sx={{ width: '100%' }} onClick={handleExit}>
-          退出
-        </Button>
-        <Button
-          sx={{ width: '100%' }}
-          onClick={() => {
-            setOpenOverDialog(false);
-          }}
-        >
-          取消
-        </Button>
-      </Box>
-    </Dialog>
+      {subtitle && (
+        <p className="text-sm text-text-muted">
+          {subtitle}
+        </p>
+      )}
+    </Modal>
   );
 }

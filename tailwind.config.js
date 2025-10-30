@@ -5,6 +5,7 @@ module.exports = {
     './client/components/**/*.{js,ts,jsx,tsx,mdx}',
     './client/app/**/*.{js,ts,jsx,tsx,mdx}',
     './ui-design-system.html',
+    './ui-design-system-simplified.html',
   ],
   theme: {
     extend: {
@@ -81,7 +82,7 @@ module.exports = {
 
       // 字体系统
       fontFamily: {
-        sans: ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Arial', 'sans-serif'],
+        sans: ['"Nunito"', '"Noto Sans SC"', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Arial', 'sans-serif'],
         mono: ['Courier New', 'monospace'],
       },
 

@@ -1,30 +1,15 @@
-import React from 'react';
-import { Box, Backdrop, CircularProgress, Typography } from '@mui/material';
+import Spinner from '@/components/ui/Spinner';
 
-interface GameLoadingProps {}
-
-const GameLoading: React.FC<GameLoadingProps> = (props) => {
+const GameLoading: React.FC = () => {
   return (
-    <Backdrop
-      sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-      open
-    >
-      <Box
-        sx={{
-          width: '200px',
-          height: '100px',
-          display: 'flex',
-          background: 'transparent',
-          alignItems: 'center!important',
-          justifyContent: 'center!important',
-        }}
-      >
-        <CircularProgress size={30} />
-        <Typography variant='body1' sx={{ marginX: 1 }}>
+    <div className="fixed inset-0 z-modal flex items-center justify-center bg-black/50 backdrop-blur-sm">
+      <div className="flex items-center gap-4 rounded-lg border-2 border-border-main bg-white/95 px-6 py-4 shadow-xl">
+        <Spinner size="md" />
+        <span className="text-sm font-medium text-text-primary">
           游戏加载中...
-        </Typography>
-      </Box>
-    </Backdrop>
+        </span>
+      </div>
+    </div>
   );
 };
 

@@ -10,23 +10,6 @@ import {
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
-  Box,
-  ButtonGroup,
-  Card,
-  CardHeader,
-  CardContent,
-  TextField,
-  Button,
-  Typography,
-  Snackbar,
-  Alert,
-  AlertTitle,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-} from '@mui/material';
-import {
   Position,
   TileType,
   CustomMapTileData,
@@ -34,9 +17,7 @@ import {
   CustomMapData,
 } from '@/lib/types';
 import CustomMapTile from '@/components/game/CustomMapTile';
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
-import ClearIcon from '@mui/icons-material/Clear';
-import { AspectRatioRounded, InfoRounded } from '@mui/icons-material';
+import { AspectRatioIcon, InfoIcon, CloseIcon } from '@/components/ui/icons';
 import { snackStateReducer } from '@/context/GameReducer';
 import useMap from '@/hooks/useMap';
 import MapExplorer from '@/components/game/MapExplorer';
@@ -44,7 +25,9 @@ import Loading from '@/components/Loading';
 import PublishMapDialog from '@/components/PublishMapDialog';
 import ReactMarkdown from 'react-markdown';
 import { v4 as uuidv4 } from 'uuid';
-import styled from '@emotion/styled';
+import Toast from '@/components/ui/Toast';
+import Modal from '@/components/ui/Modal';
+import clsx from 'classnames';
 
 const name2TileType: Record<string, TileType> = {
   king: TileType.King,
@@ -53,17 +36,6 @@ const name2TileType: Record<string, TileType> = {
   mountain: TileType.Mountain,
   swamp: TileType.Swamp,
 };
-
-const IconBox = styled.div(
-  (props: any) => `
-  cursor: pointer;
-  background-color: ${props.bgcolor};
-  &:hover {
-    background-color: ${props.bgcolor ? props.bgcolor : 'rgba(255, 85, 85, 0.1)'
-    }
-  }
-`
-);
 
 function getNewMapData(): CustomMapTileData[][] {
   return Array.from({ length: 10 }, () =>
@@ -525,343 +497,245 @@ function MapEditor({ editMode }: { editMode: boolean }) {
   }, [mapRef, editMode, handleKeyDown]);
 
   return (
-    <div
-      className='app-container'
-      style={{ position: 'relative', overflow: 'hidden' }}
-    >
-      <Snackbar
+    <div className="app-container relative overflow-hidden">
+      <Toast
         open={snackState.open}
-        autoHideDuration={snackState.duration}
-        onClose={() => {
-          console.log(snackState);
-          snackStateDispatch({ type: 'toggle', duration: null });
-        }}
-      >
-        <Alert severity={snackState.status} sx={{ width: '100%' }}>
-          <AlertTitle>{snackState.title}</AlertTitle>
-          {snackState.message}
-        </Alert>
-      </Snackbar>
+        title={snackState.title}
+        message={snackState.message}
+        type={snackState.status}
+        duration={snackState.duration ?? undefined}
+        onClose={() => snackStateDispatch({ type: 'toggle', duration: null })}
+      />
+
       {!editMode && <Loading open={loading} title="加载地图中" />}
-      {!editMode && (
-        <>
-          <Box
-            className='menu-container'
-            sx={{
-              position: 'absolute',
-              bottom: '0',
-              left: '50%',
-              width: {
-                xs: '90vw',
-                md: '55vw',
-                lg: '45vw',
-              },
-              transform: `translate(-50%, 0)`,
-              minHeight: '10%',
-              maxHeight: '30%',
-              overflowY: 'auto',
-              borderRadius: '24px 24px 0px 0px !important',
-              zIndex: 101,
-              padding: '13px !important',
-            }}
-          >
-            <Typography variant='h5' color='white'>{mapName}</Typography>
-            <ReactMarkdown className='react_markdown'>
-              {mapDescription}
-            </ReactMarkdown>
-          </Box>
-          <Button
-            size='large'
-            sx={{
-              zIndex: 1001,
-              position: 'absolute',
-              bottom: '5px',
-              left: '50%',
-              transform: `translate(-50%, 0)`,
-              boxShadow: 3,
-            }}
-            variant='contained'
-            color='primary'
-            onClick={handleDownloadMap}
-          >
-            下载文件
-          </Button>
-        </>
-      )}
+
       <PublishMapDialog
         open={openPublishDialog}
         onClose={() => setOpenPublishDialog(false)}
         mapId={publishMapId}
-      ></PublishMapDialog>
+      />
 
-      <Dialog open={openMapExplorer} onClose={handleCloseMapExplorer}>
-        <DialogTitle>选择地图</DialogTitle>
-        <DialogContent>
+      <Modal
+        open={openMapExplorer}
+        onClose={handleCloseMapExplorer}
+        title="选择地图"
+        size="lg"
+        footer={
+          <button type="button" className="btn-secondary" onClick={handleCloseMapExplorer}>
+            关闭
+          </button>
+        }
+      >
+        <div className="max-h-[70vh] overflow-hidden">
           <MapExplorer userId={username} onSelect={handleMapSelect} />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseMapExplorer}>关闭</Button>
-        </DialogActions>
-      </Dialog>
+        </div>
+      </Modal>
 
       {editMode && (
-        <Box
-          className='menu-container'
-          sx={{
-            borderRadius: '24px 0 0 24px !important',
-            padding: '10px !important',
-            position: 'absolute',
-            top: '70px',
-            bottom: '70px',
-            right: 0,
-            height: 'calc(100dvh - 60px - 60px)',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            overflow: 'auto',
-            boxShadow: 3,
-            bgcolor: '#394150 !important',
-          }}
-        >
-          <Button
-            sx={{ width: '100%' }}
-            variant='contained'
+        <aside className="menu-container absolute right-0 top-[70px] bottom-[70px] flex w-72 flex-col gap-4 overflow-y-auto bg-[#394150] p-4">
+          <button
+            type="button"
+            className="btn-secondary w-full justify-center"
             onClick={handleOpenMapExplorer}
           >
             选择自定义地图
-          </Button>
+          </button>
 
-          <Card
-            variant='outlined'
-            className='menu-container'
-            sx={{
-              width: '100%',
-            }}
-          >
-            <CardHeader
-              avatar={<InfoRounded />}
-              title="基础信息"
-              sx={{ paddingBottom: 0 }}
-            />
-            <CardContent
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                paddingTop: 0,
-              }}
-            >
-              <TextField
-                id='map-name'
-                label='Map Name'
-                size='small'
-                type='text'
+          <div className="space-y-3 rounded-2xl border-2 border-border-main bg-white/95 p-4 text-sm text-text-muted">
+            <div className="flex items-center gap-2 text-text-primary">
+              <InfoIcon className="h-5 w-5" />
+              <h3 className="text-base font-semibold">基础信息</h3>
+            </div>
+            <label className="flex flex-col gap-1 text-xs font-medium text-text-muted">
+              地图名称
+              <input
+                id="map-name"
+                className="input w-full"
                 value={mapName}
-                onChange={(e) => setMapName(e.target.value)}
-                sx={{ marginY: '10px' }}
+                onChange={(event) => setMapName(event.target.value)}
+                maxLength={40}
               />
-              <TextField
-                id='map-desc'
-                label='Map Description'
-                size='small'
-                type='text'
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-text-muted">
+              地图简介
+              <textarea
+                id="map-desc"
+                className="input w-full min-h-[96px] resize-y"
                 value={mapDescription}
-                onChange={(e) => setMapDescription(e.target.value)}
-                multiline
-                minRows={3}
-                maxRows={8}
+                onChange={(event) => setMapDescription(event.target.value)}
               />
-            </CardContent>
-          </Card>
-          <Card
-            variant='outlined'
-            className='menu-container'
-            sx={{
-              width: '100%',
-            }}
-          >
-            <CardHeader avatar={<AspectRatioRounded />} title="地图大小" />
-            <CardContent
-              sx={{
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-              }}
-            >
-              <TextField
-                id='map-width'
-                label='Map Width'
-                size='small'
-                type='number'
+            </label>
+          </div>
+
+          <div className="space-y-3 rounded-2xl border-2 border-border-main bg-white/95 p-4 text-sm text-text-muted">
+            <div className="flex items-center gap-2 text-text-primary">
+              <AspectRatioIcon className="h-5 w-5" />
+              <h3 className="text-base font-semibold">地图大小</h3>
+            </div>
+            <label className="flex flex-col gap-1 text-xs font-medium text-text-muted">
+              宽度
+              <input
+                id="map-width"
+                type="number"
+                className="input w-full"
                 value={mapWidth}
                 onChange={handleMapWidthChange}
-                sx={{ marginBottom: '10px' }}
               />
-              <TextField
-                id='map-height'
-                label='Map Height'
-                size='small'
-                type='number'
+            </label>
+            <label className="flex flex-col gap-1 text-xs font-medium text-text-muted">
+              高度
+              <input
+                id="map-height"
+                type="number"
+                className="input w-full"
                 value={mapHeight}
                 onChange={handleMapHeightChange}
               />
-            </CardContent>
-          </Card>
-          <ButtonGroup size='large' sx={{ width: '100%' }}>
-            <Button
-              sx={{ width: '100%' }}
-              variant='outlined'
-              onClick={handleDownloadMap}
-            >
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <button type="button" className="btn-secondary justify-center" onClick={handleDownloadMap}>
               下载文件
-            </Button>
-            <Button
-              sx={{ width: '100%' }}
-              variant='outlined'
-              onClick={handleUploadMap}
-            >
+            </button>
+            <button type="button" className="btn-secondary justify-center" onClick={handleUploadMap}>
               上传文件
-            </Button>
-          </ButtonGroup>
-          <ButtonGroup size='large' sx={{ width: '100%' }}>
-            <Button
-              sx={{ width: '100%' }}
-              variant='outlined'
-              onClick={handleSaveDraft}
-            >
-              保存草稿
-            </Button>
-            <Button
-              sx={{ width: '100%' }}
-              variant='contained'
-              onClick={handlePublish}
-            >
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+            <button type="button" className="btn-secondary justify-center" onClick={handleSaveDraft}>
+              {draftSaved ? '草稿已保存' : '保存草稿'}
+            </button>
+            <button type="button" className="btn-primary justify-center" onClick={handlePublish}>
               发布
-            </Button>
-          </ButtonGroup>
-        </Box>
+            </button>
+          </div>
+        </aside>
       )}
 
       {editMode && (
-        <Box
-          className='menu-container'
-          sx={{
-            position: 'absolute',
-            top: '70px',
-            bottom: '70px',
-            left: 0,
-            width: '90px',
-            height: 'calc(100dvh - 60px - 60px)',
-            borderRadius: '0 24px 24px 0 !important',
-            boxShadow: 3,
-            bgcolor: '#394150 !important',
-          }}
-        >
-          <Box sx={{ width: '100%', overflowY: 'auto', height: '100%' }}>
-            {Object.keys(name2TileType).map((tileName) => (
-              <IconBox
-                key={tileName}
-                className='icon-box'
-                bgcolor={
-                  selectedTileType === name2TileType[tileName] ? '#4e80f0' : '#394150'
-                }
-                onClick={() => {
-                  setSelectedTileType(name2TileType[tileName]);
-                  setSelectedProperty(null);
-                }}
-                sx={{ cursor: 'pointer' }}
-              >
-                {tileName === 'plain' ? (
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      backgroundColor: '#808080',
-                      border: '#000 solid 1px',
-                    }}
-                  />
-                ) : (
-                  <Image
-                    src={TileType2Image[name2TileType[tileName]]}
-                    alt={tileName}
-                    width={40}
-                    height={40}
-                    draggable={false}
-                  />
-                )}
-                <Typography align='center' color='white' fontSize='8rm'>
-                  {tileName === 'king' ? '王' : tileName === 'city' ? '城池' : tileName === 'plain' ? '平原' : tileName === 'mountain' ? '山丘' : tileName === 'swamp' ? '沼泽' : tileName}
-                </Typography>
-              </IconBox>
-            ))}
+        <aside className="menu-container absolute left-0 top-[70px] bottom-[70px] flex w-28 flex-col overflow-y-auto bg-[#394150] p-2">
+          <div className="flex flex-col gap-2">
+            {Object.keys(name2TileType).map((tileName) => {
+              const isActive = selectedTileType === name2TileType[tileName];
+              return (
+                <button
+                  key={tileName}
+                  type="button"
+                  onClick={() => {
+                    setSelectedTileType(name2TileType[tileName]);
+                    setSelectedProperty(null);
+                  }}
+                  className={clsx(
+                    'flex flex-col items-center gap-2 rounded-xl border-2 p-3 text-xs font-semibold text-white transition',
+                    isActive
+                      ? 'border-player-2 bg-player-2 text-white shadow'
+                      : 'border-transparent bg-transparent hover:border-player-2',
+                  )}
+                >
+                  {tileName === 'plain' ? (
+                    <span className="inline-flex h-10 w-10 items-center justify-center rounded border border-black bg-gray-500" />
+                  ) : (
+                    <Image
+                      src={TileType2Image[name2TileType[tileName]]}
+                      alt={tileName}
+                      width={40}
+                      height={40}
+                      draggable={false}
+                    />
+                  )}
+                  <span className="text-xs">
+                    {tileName === 'king'
+                      ? '王'
+                      : tileName === 'city'
+                        ? '城池'
+                        : tileName === 'plain'
+                          ? '平原'
+                          : tileName === 'mountain'
+                            ? '山丘'
+                            : tileName === 'swamp'
+                              ? '沼泽'
+                              : tileName}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
 
-            {Object.keys(property2var).map((property) => (
-              <IconBox
-                key={property}
-                className='icon-box'
-                bgcolor={selectedProperty === property ? '#4e80f0' : '#394150'}
-                onClick={() => {
-                  setSelectedProperty(property);
-                  setSelectedTileType(null);
-                }}
-              >
-                {property === 'revealed' ? (
-                  <LightbulbOutlinedIcon
-                    sx={{
-                      width: 30,
-                      height: 30,
-                      color: '#fff !important',
-                    }}
-                  />
-                ) : (
-                  <TextField
-                    id={property}
-                    type='number'
-                    variant='standard'
-                    hiddenLabel
-                    inputProps={{
-                      min: property2min[property],
-                      max: property2max[property],
-                      style: { textAlign: 'center' },
-                    }}
-                    value={property2var[property]}
-                    onChange={(event) =>
-                      property2setVar[property](+event.target.value)
-                    }
-                  />
-                )}
-                <Typography align='center' color='white' fontSize='8rm'>
-                  {property === 'team' ? '团队' : property === 'unitsCount' ? '兵数' : property === 'priority' ? '优先级' : property === 'revealed' ? '全局可见' : property}
-                </Typography>
-              </IconBox>
-            ))}
+          <div className="mt-4 flex flex-col gap-2">
+            {Object.keys(property2var).map((property) => {
+              const isActive = selectedProperty === property;
+              const isToggle = property === 'revealed';
+              const label =
+                property === 'team'
+                  ? '团队'
+                  : property === 'unitsCount'
+                    ? '兵数'
+                    : property === 'priority'
+                      ? '优先级'
+                      : property === 'revealed'
+                        ? '全局可见'
+                        : property;
 
-            <IconBox
-              key='clear-all'
-              className='icon-box'
-              onClick={() => {
-                setMapData(getNewMapData());
-              }}
+              return (
+                <div
+                  key={property}
+                  onClick={() => {
+                    setSelectedProperty(property);
+                    setSelectedTileType(null);
+                  }}
+                  className={clsx(
+                    'flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 p-3 text-xs font-semibold text-white transition',
+                    isActive
+                      ? 'border-player-2 bg-player-2 shadow'
+                      : 'border-transparent bg-transparent hover:border-player-2',
+                  )}
+                >
+                  {isToggle ? (
+                    <span className="text-lg">💡</span>
+                  ) : (
+                    <input
+                      id={property}
+                      type="number"
+                      className="w-16 rounded border border-white/40 bg-white/10 p-1 text-center text-sm text-white focus:border-white focus:outline-none"
+                      value={property2var[property] ?? ''}
+                      min={property2min[property]}
+                      max={property2max[property]}
+                      onClick={(event) => event.stopPropagation()}
+                      onChange={(event) => property2setVar[property](+event.target.value)}
+                    />
+                  )}
+                  <span>{label}</span>
+                </div>
+              );
+            })}
+
+            <button
+              type="button"
+              onClick={() => setMapData(getNewMapData())}
+              className="flex flex-col items-center gap-2 rounded-xl border-2 border-red-400 bg-red-500/30 p-3 text-xs font-semibold text-red-100 transition hover:border-red-300"
             >
-              <ClearIcon
-                sx={{
-                  width: 30,
-                  height: 30,
-                  color: 'red !important',
-                  cursor: 'pointer',
-                }}
-              />
-              <Typography align='center' color='white' fontSize='8rm'>
-                清除全部
-              </Typography>
-            </IconBox>
-          </Box>
-        </Box>
-      )
-      }
+              <CloseIcon className="h-5 w-5" />
+              清除全部
+            </button>
+          </div>
+        </aside>
+      )}
+
+      {!editMode && (
+        <div className="menu-container absolute bottom-0 left-1/2 z-[101] w-[90vw] max-w-3xl -translate-x-1/2 rounded-t-3xl bg-[#212936]/95 p-5 text-white md:w-[55vw] lg:w-[45vw]">
+          <h2 className="text-xl font-semibold">{mapName}</h2>
+          <ReactMarkdown className="react_markdown mt-3">{mapDescription}</ReactMarkdown>
+          <button
+            type="button"
+            className="btn-primary mt-4 w-full justify-center"
+            onClick={handleDownloadMap}
+          >
+            下载文件
+          </button>
+        </div>
+      )}
 
       <div
         ref={mapRef}
@@ -871,7 +745,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
           top: '50%',
           left: '50%',
           transform: `translate(-50%, -50%) translate(${position.x}px, ${position.y}px)`,
-          width: mapPixelHeight, // game's width and height are swapped
+          width: mapPixelHeight,
           height: mapPixelWidth,
           backgroundColor: '#495468',
         }}

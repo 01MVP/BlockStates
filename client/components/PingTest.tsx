@@ -20,16 +20,8 @@ const PingTest = () => {
   }, []);
 
   return (
-    <div
-      className='menu-container'
-      style={{
-        zIndex: '110',
-        display: 'flex',
-        alignItems: 'center',
-        marginRight: '0.5rem',
-      }}
-    >
-      {ping !== null ? `Ping: ${ping}ms` : 'null'}
+    <div className="rounded-2xl border-2 border-border-main bg-white/90 px-3 py-1 text-xs font-medium text-text-secondary shadow">
+      {ping !== null ? `Ping: ${ping}ms` : '网络不可用'}
     </div>
   );
 };

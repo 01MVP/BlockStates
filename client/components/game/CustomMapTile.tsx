@@ -6,7 +6,6 @@ import {
   TileType2Image,
 } from '@/lib/types';
 import { ColorArr } from '@/lib/constants';
-import LightbulbOutlinedIcon from '@mui/icons-material/LightbulbOutlined';
 import {
   defaultBgcolor,
   notRevealedFill,
@@ -157,15 +156,33 @@ export default React.memo(function CustomMapTile(props: CustomMapTileProps) {
       )}
 
       {isAlwaysRevealed && (
-        <LightbulbOutlinedIcon
+        <div
           style={{
             position: 'absolute',
-            top: 0,
-            right: 0,
-            width: zoomedSize * 0.5,
-            height: zoomedSize * 0.5,
+            top: zoomedSize * 0.08,
+            right: zoomedSize * 0.08,
+            width: zoomedSize * 0.45,
+            height: zoomedSize * 0.45,
+            borderRadius: '9999px',
+            backgroundColor: 'rgba(255, 255, 255, 0.85)',
+            border: '2px solid rgba(0,0,0,0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
           }}
-        />
+        >
+          <svg
+            viewBox="0 0 24 24"
+            style={{
+              width: '70%',
+              height: '70%',
+              fill: '#f39c12',
+            }}
+          >
+            <path d="M9 21h6v-1H9v1zm3-20C7.82 1 5 3.82 5 7c0 2.38 1.19 3.08 2.25 4.5.45.61.75 1.28.75 2h8c0-.72.3-1.39.75-2C17.81 10.08 19 9.38 19 7c0-3.18-2.82-6-7-6zm0 2c2.75 0 5 2.25 5 5 0 1.56-.78 2.22-1.72 3.45-.45.6-.81 1.31-.98 2.07H9.7c-.17-.76-.53-1.47-.98-2.07C7.78 10.22 7 9.56 7 8c0-2.75 2.25-5 5-5z" />
+          </svg>
+        </div>
       )}
     </div>
   );

@@ -1,95 +1,38 @@
-import { styled } from "@mui/material/styles";
-import React, { useState, useEffect, useRef } from "react";
-import { InputBase, Divider } from "@mui/material";
+import React, { useState, useEffect, useRef, ChangeEvent, KeyboardEvent as ReactKeyboardEvent } from "react";
 import { Socket } from "socket.io-client";
 import { Message } from "@/lib/types";
 import { ColorArr } from "@/lib/constants";
-import { Typography } from "@mui/material";
-import useMediaQuery from "@mui/material/useMediaQuery";
-
-const ChatBoxContainer = styled("div")`
-  position: fixed;
-  bottom: 0;
-  right: 0;
-  width: 350px;
-  height: 40vh;
-  overflow: auto;
-  z-index: 1003;
-  backdrop-filter: blur(3px);
-  background-color: #212936 !important;
-  border-radius: 24px 0 0 0;
-  box-shadow:
-    0px 2px 4px -1px rgba(0, 0, 0, 0.2),
-    0px 4px 5px 0px rgba(0, 0, 0, 0.14),
-    0px 1px 10px 0px rgba(0, 0, 0, 0.12);
-  display: flex;
-  flex-direction: column;
-  transition: all .2s ease-in-out;
-  &.shrink {
-    opacity: 0.5;
-    width: 300px;
-    height: 11vh;
-    z-index: 1001; // hide behind the game replay dock
-  }
-  @media (max-width: 600px) {
-    width: 60%;
-  }
-`;
-
-const ChatBoxMessages = styled("div")`
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  line-height: 1.5em;
-  &.shrink {
-    height: 10vh;
-  }
-  &:hover {
-    cursor: pointer;
-  }
-`;
-
-const ChatBoxInput = styled("div")`
-  display: flex;
-  align-items: center;
-`;
+import clsx from "classnames";
+import useMediaQuery from "@/hooks/useMediaQuery";
 
 const ChatBoxMessage = ({ message }: { message: Message }) => {
   return (
-    <div>
+    <div className="chat-message text-white">
       {message.player ? (
         <span
           style={{
             paddingLeft: 10,
-            display: "inline",
             color: ColorArr[message.player.color],
           }}
         >
           {message.player.username}
         </span>
       ) : (
-        <Typography color="white" style={{ display: "inline" }}>
-          {"[system]"}
-        </Typography>
+        <span className="text-white">[system]</span>
       )}
       &nbsp;
-      <Typography color="white" style={{ display: "inline" }}>
-        {message.content}
-      </Typography>
+      <span className="text-white">{message.content}</span>
       &nbsp;
       {message.target && (
         <>
           <span
             style={{
-              display: "inline",
               color: ColorArr[message.target.color],
             }}
           >
             {message.target.username}
           </span>
-          <Typography color="white" style={{ display: "inline" }}>
-            .
-          </Typography>
+          <span className="text-white">.</span>
         </>
       )}
       <br />
@@ -105,20 +48,20 @@ interface ChatBoxProp {
 export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
   const [inputValue, setInputValue] = useState("");
   const [isExpand, setIsExpand] = useState(false);
-  const textFieldRef = useRef<any>(null);
-  const messagesEndRef = useRef<any>(null);
+  const textFieldRef = useRef<HTMLInputElement | null>(null);
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  const isSmallScreen = useMediaQuery("(max-width:600px)");
+  const isSmallScreen = useMediaQuery("(max-width: 600px)");
 
   useEffect(() => {
-    messagesEndRef.current.scrollIntoView({});
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isExpand]);
 
   useEffect(() => {
     setIsExpand(!isSmallScreen);
   }, [isSmallScreen]);
 
-  const handleInputKeyDown = (event: any) => {
+  const handleInputKeyDown = (event: ReactKeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       handleSendMessage();
     }
@@ -138,7 +81,7 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
     };
   }, []);
 
-  const handleInputChange = (event: any) => {
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     setInputValue(event.target.value);
   };
 
@@ -150,42 +93,48 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
   };
 
   return (
-    <ChatBoxContainer
-      className={isExpand ? "" : "shrink"}
+    <div
+      className={clsx(
+        "fixed bottom-0 right-0 z-tooltip flex flex-col rounded-tl-2xl border-2 border-border-main bg-[#212936]/95 text-sm text-white shadow-2xl backdrop-blur-md transition-all",
+        "md:w-[350px] md:h-[40vh]",
+        "sm:w-[60%]",
+        isExpand
+          ? "h-[40vh] w-[320px] md:w-[350px]"
+          : "h-[12vh] w-[260px] opacity-80 md:w-[300px]",
+      )}
       onClick={() => {
         if (!isExpand) setIsExpand(true);
       }}
     >
-      <ChatBoxMessages
+      <div
         onClick={() => {
           if (isExpand) setIsExpand(false);
         }}
+        className={clsx(
+          "flex-1 overflow-y-auto px-4 py-3 transition-all",
+          isExpand ? "cursor-default" : "cursor-pointer",
+        )}
       >
         {messages.map((message, index) => (
           <ChatBoxMessage key={index} message={message} />
         ))}
         <div ref={messagesEndRef} />
-      </ChatBoxMessages>
+      </div>
       {socket && (
         <>
-          <Divider />
-          <ChatBoxInput>
-            <InputBase
-              margin="none"
-              sx={{
-                width: "100%",
-                padding: "5px 10px",
-              }}
+          <div className="border-t border-white/10" />
+          <div className="flex items-center px-4 py-2">
+            <input
+              className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60 focus:border-player-2 focus:outline-none focus:ring-2 focus:ring-player-2/40"
               placeholder="开始聊天，回车发送"
-              size="medium"
               value={inputValue}
               onChange={handleInputChange}
-              inputRef={textFieldRef}
+              ref={textFieldRef}
               onKeyDown={handleInputKeyDown}
             />
-          </ChatBoxInput>
+          </div>
         </>
       )}
-    </ChatBoxContainer>
+    </div>
   );
 });

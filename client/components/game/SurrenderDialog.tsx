@@ -1,17 +1,9 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import {
-  Box,
-  Button,
-  Dialog,
-  DialogActions,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-} from '@mui/material';
+import React, { useCallback, useEffect } from 'react';
 import { useGame } from '@/context/GameContext';
 import { useRouter } from 'next/navigation';
 import { RoomUiStatus } from '@/lib/types';
 import { MaxTeamNum } from '@/lib/constants';
+import Modal from '@/components/ui/Modal';
 
 export default function SurrenderDialog({
   isOpen,
@@ -19,19 +11,11 @@ export default function SurrenderDialog({
   handleSurrender,
 }: {
   isOpen: boolean;
-  setOpen: any;
+  setOpen: (value: boolean) => void;
   handleSurrender: () => void;
 }) {
   const { openOverDialog, isSurrendered, team, roomUiStatus } = useGame();
   const router = useRouter();
-
-  const handleClose = useCallback(
-    (event: any, reason: string) => {
-      if (reason === 'backdropClick') return;
-      setOpen(false);
-    },
-    [setOpen]
-  );
 
   const handleKeydown = useCallback(
     (event: KeyboardEvent) => {
@@ -65,48 +49,53 @@ export default function SurrenderDialog({
     };
   }, [handleKeydown]);
 
+  const title = showExitTitle ? '你确定要退出？' : '你确定要投降？';
+  const description = showExitTitle
+    ? '退出后将返回大厅。'
+    : '投降后你在本局的所有领地将被清空，确定继续吗？';
+
   return (
-    <Dialog
+    <Modal
       open={isOpen}
-      onClose={handleClose}
-      maxWidth='md'
-      aria-labelledby='Surrender Dialog'
-      aria-describedby='Ensure user wants to surrender'
-    >
-      <DialogTitle>
-        {showExitTitle
-          ? '你确定要退出？'
-          : '你确定要投降？'}
-      </DialogTitle>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          width: '100%',
-        }}
-      >
-        {showExitTitle ? (
-          <Button sx={{ width: '100%' }} onClick={handleExit}>
-            退出
-          </Button>
-        ) : (
-          <>
-            <Button sx={{ width: '100%' }} onClick={handleCloseSurrender}>
+      onClose={() => setOpen(false)}
+      title={title}
+      description={description}
+      size="sm"
+      disableBackdropClose
+      footer={
+        <>
+          {showExitTitle ? (
+            <button
+              type="button"
+              className="btn-primary w-full justify-center"
+              onClick={handleExit}
+            >
+              退出
+            </button>
+          ) : (
+            <button
+              type="button"
+              className="btn-primary w-full justify-center"
+              onClick={handleCloseSurrender}
+            >
               投降
-            </Button>
-          </>
-        )}
-        <Button
-          sx={{ width: '100%' }}
-          onClick={() => {
-            setOpen(false);
-          }}
-        >
-          取消
-        </Button>
-      </Box>
-    </Dialog>
+            </button>
+          )}
+          <button
+            type="button"
+            className="btn-secondary w-full justify-center"
+            onClick={() => setOpen(false)}
+          >
+            取消
+          </button>
+        </>
+      }
+    >
+      <p className="text-sm text-text-muted">
+        {showExitTitle
+          ? '本局已经结束或你已成为观战者，随时可以重新加入新的战斗。'
+          : '你仍可以继续战斗，或选择投降返回房间。'}
+      </p>
+    </Modal>
   );
 }

@@ -1,8 +1,4 @@
-import * as React from 'react';
-import CircularProgress from '@mui/material/CircularProgress';
-import Box from '@mui/material/Box';
-import Modal from '@mui/material/Modal';
-import Typography from '@mui/material/Typography';
+import Spinner from '@/components/ui/Spinner';
 
 interface LoadingProps {
   open: boolean;
@@ -10,35 +6,19 @@ interface LoadingProps {
 }
 
 const Loading: React.FC<LoadingProps> = ({ open, title }) => {
+  if (!open) {
+    return null;
+  }
+
   return (
-    <Modal
-      open={open}
-      aria-labelledby='modal-modal-title'
-      aria-describedby='modal-modal-description'
-    >
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
-        }}
-      >
-        <Box
-          className='menu-container'
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <Typography variant='h5'>{title}</Typography>
-          <CircularProgress />
-        </Box>
-      </Box>
-    </Modal>
+    <div className="fixed inset-0 z-modal flex items-center justify-center bg-black/40 backdrop-blur-sm">
+      <div className="card flex w-full max-w-sm flex-col items-center gap-4 text-center shadow-xl">
+        {title && (
+          <h3 className="text-lg font-medium text-text-primary">{title}</h3>
+        )}
+        <Spinner size="lg" />
+      </div>
+    </div>
   );
 };
 
