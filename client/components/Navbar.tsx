@@ -18,7 +18,7 @@ const navItems = [
   { href: 'https://docs.block-empire.com/', label: '文档', external: true },
   { href: 'https://github.com/01MVP/BlockEmpire', label: 'GitHub', external: true },
   {
-    href: 'https://github.com/01MVP/BlockEmpire',
+    href: 'https://github.com/01MVP/BlockEmpire#开发机器人',
     label: '开发机器人',
     external: true,
   },
@@ -91,8 +91,8 @@ function Navbar() {
           <Link href="/" className="flex items-center gap-2">
             <Image
               src="/img/logo.svg"
-              width={120}
-              height={24}
+              width={32}
+              height={32}
               alt="Block Empire"
               priority
             />
