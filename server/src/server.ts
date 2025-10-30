@@ -11,13 +11,14 @@ import { PrismaClient } from '@prisma/client';
 
 import { ColorArr, MaxTeamNum, forceStartOK } from './lib/constants';
 import { roomPool, createRoom } from './lib/room-pool';
-import { Room, initGameInfo, CustomMapData, MapDiffData, LeaderBoardTable, LeaderBoardRow } from './lib/types';
+import { Room, initGameInfo, CustomMapData, MapDiffData, LeaderBoardTable, LeaderBoardRow, BotConfig } from './lib/types';
 import { getPlayerIndex, getPlayerIndexBySocket } from './lib/utils';
 import Point from './lib/point';
 import Player from './lib/player';
 import GameMap from './lib/map';
 import MapDiff from './lib/map-diff';
 import GameRecord from './lib/game-record';
+import { BotManager } from './lib/bot-manager';
 
 dotenv.config();
 
@@ -274,8 +275,184 @@ app.get('/starredMaps', async (req, res) => {
   res.json(starredMaps.map((starUsers) => starUsers.mapId));
 });
 
-const server = app.listen(process.env.PORT, () => {
+// Bot Management APIs
+
+// Add a bot to a room
+app.post('/api/bots/add', async (req: Request, res: Response) => {
+  try {
+    const { roomId, botName, difficulty = 'medium', maxReactionTime = 1000 } = req.body;
+
+    // Validate required fields
+    if (!roomId || !botName) {
+      res.status(400).json({ error: 'roomId and botName are required' });
+      return;
+    }
+
+    // Validate difficulty
+    if (!['easy', 'medium', 'hard'].includes(difficulty)) {
+      res.status(400).json({ error: 'Invalid difficulty level' });
+      return;
+    }
+
+    const config: BotConfig = {
+      roomId,
+      botName,
+      difficulty,
+      maxReactionTime
+    };
+
+    const result = await botManager.addBot(config);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        botId: result.botId,
+        message: 'Bot added successfully'
+      });
+    } else {
+      res.status(400).json({
+        success: false,
+        error: result.message
+      });
+    }
+  } catch (error: any) {
+    console.error('Error adding bot:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Remove a bot
+app.delete('/api/bots/:botId', async (req: Request, res: Response) => {
+  try {
+    const { botId } = req.params;
+
+    if (!botId) {
+      res.status(400).json({ error: 'Bot ID is required' });
+      return;
+    }
+
+    const result = await botManager.removeBot(botId);
+
+    if (result.success) {
+      res.status(200).json({
+        success: true,
+        message: 'Bot removed successfully'
+      });
+    } else {
+      res.status(404).json({
+        success: false,
+        error: result.message
+      });
+    }
+  } catch (error: any) {
+    console.error('Error removing bot:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get all bots
+app.get('/api/bots', (req: Request, res: Response) => {
+  try {
+    const bots = botManager.getAllBots();
+    const sanitizedBots = bots.map(bot => ({
+      id: bot.id,
+      roomId: bot.roomId,
+      username: bot.username,
+      isActive: bot.isActive,
+      createdAt: bot.createdAt,
+      lastActiveAt: bot.lastActiveAt,
+      color: bot.color
+    }));
+
+    res.status(200).json(sanitizedBots);
+  } catch (error: any) {
+    console.error('Error getting bots:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get bots by room
+app.get('/api/bots/room/:roomId', (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.params;
+
+    if (!roomId) {
+      res.status(400).json({ error: 'Room ID is required' });
+      return;
+    }
+
+    const bots = botManager.getBotsByRoom(roomId);
+    const sanitizedBots = bots.map(bot => ({
+      id: bot.id,
+      username: bot.username,
+      isActive: bot.isActive,
+      createdAt: bot.createdAt,
+      lastActiveAt: bot.lastActiveAt,
+      color: bot.color
+    }));
+
+    res.status(200).json(sanitizedBots);
+  } catch (error: any) {
+    console.error('Error getting room bots:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Get bot statistics
+app.get('/api/bots/stats', (req: Request, res: Response) => {
+  try {
+    const stats = botManager.getStats();
+    res.status(200).json(stats);
+  } catch (error: any) {
+    console.error('Error getting bot stats:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// Set maximum bot limit
+app.post('/api/bots/config', (req: Request, res: Response) => {
+  try {
+    const { maxBots, memoryThreshold } = req.body;
+
+    if (maxBots !== undefined) {
+      if (typeof maxBots !== 'number' || maxBots < 0 || maxBots > 20) {
+        res.status(400).json({ error: 'maxBots must be a number between 0 and 20' });
+        return;
+      }
+      botManager.setMaxBots(maxBots);
+    }
+
+    if (memoryThreshold !== undefined) {
+      if (typeof memoryThreshold !== 'number' || memoryThreshold < 100) {
+        res.status(400).json({ error: 'memoryThreshold must be at least 100MB' });
+        return;
+      }
+      botManager.setMemoryThreshold(memoryThreshold);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Configuration updated successfully',
+      stats: botManager.getStats()
+    });
+  } catch (error: any) {
+    console.error('Error updating bot config:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+const server = app.listen(process.env.PORT, async () => {
   console.log(`Application started on port ${process.env.PORT}!`);
+
+  // Start default bot after a short delay to ensure server is fully ready
+  setTimeout(async () => {
+    try {
+      console.log('Starting default bot in room 1...');
+      await botManager.startDefaultBot();
+    } catch (error: any) {
+      console.error('Failed to start default bot:', error.message);
+    }
+  }, 2000); // 2 second delay
 });
 
 const io = new Server(server, {
@@ -283,6 +460,9 @@ const io = new Server(server, {
     origin: cors_urls,
   },
 });
+
+// Initialize BotManager
+const botManager = BotManager.getInstance(io);
 
 function handleNeutralized(room: Room, player: Player) {
   if (player.king) {

@@ -222,3 +222,106 @@ export type CustomMapInfo = {
   views: number;
   starCount: number;
 };
+
+// Bot-related types
+export interface ExPosition {
+  x: number;
+  y: number;
+  color: number;
+}
+
+export interface VlPosition {
+  x: number;
+  y: number;
+  unit: number;
+}
+
+export interface BotInstance {
+  id: string;
+  roomId: string;
+  room: Room | null;
+  username: string;
+  myPlayerId: string | null;
+  color: number | null;
+  attackColor: number;
+  attackRoute: Array<Position>;
+  myGeneral: Position | null;
+  myGeneralThreatened: boolean;
+  enemyGeneral: Array<ExPosition>;
+  initGameInfo: initGameInfo | null;
+  gameMap: TileProp[][] | null;
+  totalViewed: boolean[][] | null;
+  leaderBoardData: LeaderBoardTable | null;
+  queue: AttackQueue | null;
+  socket: any | null;
+  isActive: boolean;
+  createdAt: Date;
+  lastActiveAt: Date;
+}
+
+export enum QuePurpose {
+  Defend = 0,
+  Attack = 1,
+  AttackGather = 2,
+  AttackGeneral = 3,
+  ExpandCity = 4,
+  ExpandLand = 5,
+}
+
+export interface QueItem {
+  purpose: QuePurpose;
+  priority: number;
+  from: Position;
+  to: Position;
+  target: Position;
+}
+
+export class AttackQueue {
+  constructor(public que: Array<QueItem> = []) { }
+
+  pushBack(item: QueItem): void {
+    this.que.push(item);
+  }
+
+  popFront(): QueItem | undefined {
+    return this.que.shift();
+  }
+
+  isEmpty(): boolean {
+    return this.que.length === 0;
+  }
+
+  clear(): void {
+    this.que = [];
+  }
+
+  size(): number {
+    return this.que.length;
+  }
+}
+
+export interface BFSQueItem {
+  pos: Position;
+  step: number;
+}
+
+export interface ExBFSQueItem {
+  pos: Position;
+  step: number;
+  way: Position[];
+}
+
+export interface BotConfig {
+  roomId: string;
+  botName: string;
+  difficulty: 'easy' | 'medium' | 'hard';
+  maxReactionTime: number; // milliseconds
+}
+
+export interface BotManagerStats {
+  totalBots: number;
+  activeBots: number;
+  maxBots: number;
+  memoryUsage: number; // MB
+  averageReactionTime: number; // milliseconds
+}
