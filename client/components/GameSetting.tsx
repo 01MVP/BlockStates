@@ -107,7 +107,9 @@ const GameSetting: React.FC = () => {
         },
       });
 
-      socketRef.current.emit('change_room_setting', property, value);
+      if (socketRef.current) {
+        socketRef.current.emit('change_room_setting', property, value);
+      }
     },
     [roomDispatch, socketRef],
   );
@@ -135,13 +137,16 @@ const GameSetting: React.FC = () => {
         },
       });
     }
-    socketRef.current.emit('change_room_setting', 'roomName', name);
+    if (socketRef.current) {
+      socketRef.current.emit('change_room_setting', 'roomName', name);
+    }
   };
 
   const handleTeamChange = (newTeam: number) => {
-    if (disabledUI) return;
     setTeam(newTeam);
-    socketRef.current.emit('set_team', newTeam);
+    if (socketRef.current) {
+      socketRef.current.emit('set_team', newTeam);
+    }
   };
 
   const handleOpenMapExplorer = () => {
@@ -165,7 +170,9 @@ const GameSetting: React.FC = () => {
 
   const handleClickForceStart = () => {
     setForceStart((prev) => !prev);
-    socketRef.current.emit('force_start');
+    if (socketRef.current) {
+      socketRef.current.emit('force_start');
+    }
   };
 
   const handleCopyShareLink = async () => {
@@ -191,11 +198,15 @@ const GameSetting: React.FC = () => {
 
   const handleChangeHost = (playerId: string, username: string) => {
     console.log(`change host to ${username}, id ${playerId}`);
-    socketRef.current.emit('change_host', playerId);
+    if (socketRef.current) {
+      socketRef.current.emit('change_host', playerId);
+    }
   };
 
   const handleLeaveRoom = () => {
-    socketRef.current.disconnect();
+    if (socketRef.current) {
+      socketRef.current.disconnect();
+    }
     router.push('/');
   };
 
@@ -319,14 +330,12 @@ const GameSetting: React.FC = () => {
                     <button
                       key={value}
                       type="button"
-                      disabled={disabledUI}
                       onClick={() => handleTeamChange(value)}
                       className={clsx(
                         'rounded-md border-2 px-3 py-1 text-sm font-medium transition-all',
                         team === value
                           ? 'border-text-primary bg-text-primary text-white shadow'
                           : 'border-border-main bg-white text-text-primary hover:border-text-primary hover:bg-bg-main',
-                        disabledUI && 'cursor-not-allowed opacity-60',
                       )}
                     >
                       队伍 {value}
@@ -334,14 +343,12 @@ const GameSetting: React.FC = () => {
                   ))}
                   <button
                     type="button"
-                    disabled={disabledUI}
                     onClick={() => handleTeamChange(MaxTeamNum + 1)}
                     className={clsx(
                       'rounded-md border-2 px-3 py-1 text-sm font-medium transition-all',
                       team === MaxTeamNum + 1
                         ? 'border-text-primary bg-text-primary text-white shadow'
                         : 'border-border-main bg-white text-text-primary hover:border-text-primary hover:bg-bg-main',
-                      disabledUI && 'cursor-not-allowed opacity-60',
                     )}
                   >
                     观众

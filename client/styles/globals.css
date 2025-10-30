@@ -626,8 +626,8 @@ input[type='range']::-moz-range-thumb {
 
   /* 聊天消息 */
   .chat-message {
-    @apply px-3 py-2 text-sm leading-relaxed
-           hover:bg-white/5 transition-colors;
+    @apply py-1.5 text-sm leading-relaxed
+           hover:bg-white/5 transition-colors rounded-sm;
   }
 
   .chat-username {

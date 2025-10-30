@@ -1,5 +1,5 @@
 import clsx from 'classnames';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState, useEffect } from 'react';
 
 interface SliderMark {
   value: number;
@@ -31,7 +31,20 @@ export default function SliderBox({
   handleChange,
   disabled = false,
 }: SliderBoxProps) {
+  const [localValue, setLocalValue] = useState(value);
+
+  // Sync local value with prop value when it changes from external source
+  useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
   const handleRangeChange = (event: ChangeEvent<HTMLInputElement>) => {
+    if (disabled) return;
+    const numericValue = Number(event.target.value);
+    setLocalValue(numericValue);
+  };
+
+  const handleRangeChangeCommitted = (event: ChangeEvent<HTMLInputElement>) => {
     if (disabled) return;
     const numericValue = Number(event.target.value);
     handleChange(event.nativeEvent, numericValue);
@@ -49,7 +62,7 @@ export default function SliderBox({
         <div className="flex items-center justify-between text-xs text-text-muted">
           <span className="font-medium text-text-primary">{label}</span>
           {valueLabelDisplay !== 'off' && (
-            <span className="text-text-secondary">{value}</span>
+            <span className="text-text-secondary">{localValue}</span>
           )}
         </div>
         <input
@@ -60,8 +73,10 @@ export default function SliderBox({
           min={min}
           max={max}
           step={step}
-          value={value}
+          value={localValue}
           onChange={handleRangeChange}
+          onMouseUp={handleRangeChangeCommitted}
+          onTouchEnd={handleRangeChangeCommitted}
           disabled={disabled}
         />
         {marks && marks.length > 0 && (

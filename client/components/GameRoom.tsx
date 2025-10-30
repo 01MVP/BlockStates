@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import { io } from 'socket.io-client';
 import ChatBox from '@/components/ChatBox';
 import Navbar from '@/components/Navbar';
@@ -27,8 +27,8 @@ function GamingRoom() {
   const myPlayerIdRef = useRef<string>(''); // fix useEffect don't get newest myPlayerId
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const roomId = searchParams.get('roomId') as string;
+  const params = useParams();
+  const roomId = params.roomId as string;
 
   const {
     room,
@@ -76,8 +76,16 @@ function GamingRoom() {
 
   useEffect(() => {
     // Game Logic Init
-    if (!roomId) return;
-    if (!myUserName) return;
+    console.log('[GameRoom] useEffect - roomId:', roomId, 'myUserName:', myUserName);
+    if (!roomId) {
+      console.log('[GameRoom] No roomId, skipping socket init');
+      return;
+    }
+    if (!myUserName) {
+      console.log('[GameRoom] No myUserName, skipping socket init');
+      return;
+    }
+    console.log('[GameRoom] Initializing socket connection...');
     class AttackQueue {
       public items: Route[];
       public lastItem: Route | undefined;

@@ -7,9 +7,7 @@ module.exports = {
     './hooks/**/*.{js,ts,jsx,tsx,mdx}',
     './lib/**/*.{js,ts,jsx,tsx,mdx}',
     './styles/**/*.{css,scss}',
-    '../ui-design-system.html',
-    '../ui-design-system-simplified.html',
-    '../ui-game-components.html',
+    // Note: ui-design-system.html files are for reference only and not included in the build
   ],
   theme: {
     extend: {

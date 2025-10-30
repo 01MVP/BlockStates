@@ -53,6 +53,11 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
 
   const isSmallScreen = useMediaQuery("(max-width: 600px)");
 
+  // Debug: log socket status
+  useEffect(() => {
+    console.log("[ChatBox] Socket status:", socket ? "connected" : "not connected");
+  }, [socket]);
+
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, isExpand]);
@@ -68,7 +73,7 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
   };
 
   const handleGlobalKeyDown = (event: KeyboardEvent) => {
-    if (event.key === "Enter" && textFieldRef.current) {
+    if (event.key === "Enter" && textFieldRef.current && document.activeElement !== textFieldRef.current) {
       event.preventDefault();
       textFieldRef.current.focus();
     }
@@ -107,12 +112,15 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
       }}
     >
       <div
-        onClick={() => {
-          if (isExpand) setIsExpand(false);
+        onClick={(e) => {
+          if (isExpand) {
+            e.stopPropagation(); // Prevent triggering parent's onClick
+            setIsExpand(false);
+          }
         }}
         className={clsx(
           "flex-1 overflow-y-auto px-4 py-3 transition-all",
-          isExpand ? "cursor-default" : "cursor-pointer",
+          !isExpand && "cursor-pointer",
         )}
       >
         {messages.map((message, index) => (
@@ -120,21 +128,18 @@ export default React.memo(function ChatBox({ socket, messages }: ChatBoxProp) {
         ))}
         <div ref={messagesEndRef} />
       </div>
-      {socket && (
-        <>
-          <div className="border-t border-white/10" />
-          <div className="flex items-center px-4 py-2">
-            <input
-              className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60 focus:border-player-2 focus:outline-none focus:ring-2 focus:ring-player-2/40"
-              placeholder="开始聊天，回车发送"
-              value={inputValue}
-              onChange={handleInputChange}
-              ref={textFieldRef}
-              onKeyDown={handleInputKeyDown}
-            />
-          </div>
-        </>
-      )}
+      <div className="border-t border-white/10" />
+      <div className="flex items-center px-4 py-2">
+        <input
+          className="w-full rounded-md border border-white/10 bg-white/10 px-3 py-2 text-sm text-white placeholder:text-white/60 focus:border-player-2 focus:outline-none focus:ring-2 focus:ring-player-2/40 disabled:opacity-50"
+          placeholder={socket ? "开始聊天，回车发送" : "等待连接..."}
+          value={inputValue}
+          onChange={handleInputChange}
+          ref={textFieldRef}
+          onKeyDown={handleInputKeyDown}
+          disabled={!socket}
+        />
+      </div>
     </div>
   );
 });

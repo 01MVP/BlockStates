@@ -67,7 +67,7 @@ export default function PlayerTable({
 
   const teamEntries = Array.from({ length: MaxTeamNum + 2 }, (_, index) => ({
     teamId: index,
-    label: index <= MaxTeamNum ? `TEAM ${index}` : '观众',
+    label: index === 0 ? '未分配' : index <= MaxTeamNum ? `队伍 ${index}` : '观众',
     members: teams[index] ?? [],
   }));
 
