@@ -397,7 +397,7 @@ input[type='range']::-moz-range-thumb {
   border-radius: 24px;
 }
 
-/* ==================== Block Empire Tailwind Components ==================== */
+/* ==================== Block States Tailwind Components ==================== */
 /*
  * 使用 @apply 将常用的 Tailwind 组合简化为语义化的类名
  * 这些类可以在整个项目中复用，保持一致性

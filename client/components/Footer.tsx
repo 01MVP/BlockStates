@@ -7,7 +7,7 @@ function Footer() {
     <footer className="mt-auto w-full border-t-2 border-border-main bg-white/80 py-6 backdrop-blur-lg">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-2 text-sm text-text-muted">
         <p>
-          版权所有 © 2022~{new Date().getFullYear()} Block Empire 开源团队
+          版权所有 © 2024~{new Date().getFullYear()} Block States 
         </p>
         {chinaWebsite && (
           <Link

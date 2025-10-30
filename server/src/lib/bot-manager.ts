@@ -10,13 +10,13 @@ import {
   MapDiffData,
   LeaderBoardTable
 } from './types';
-import { GenniaBotAI } from './bot-ai';
+import { BlockStatesBotAI } from './bot-ai';
 import { roomPool } from './room-pool';
 
 export class BotManager {
   private static instance: BotManager;
   private bots: Map<string, BotInstance> = new Map();
-  private aiInstances: Map<string, GenniaBotAI> = new Map();
+  private aiInstances: Map<string, BlockStatesBotAI> = new Map();
   private maxBots: number = 10;
   private io: Server;
   private memoryThreshold: number = 1024; // MB
@@ -88,7 +88,7 @@ export class BotManager {
       };
 
       // Create AI instance
-      const ai = new GenniaBotAI(bot);
+      const ai = new BlockStatesBotAI(bot);
       this.aiInstances.set(botId, ai);
 
       // Connect bot to room
@@ -144,7 +144,7 @@ export class BotManager {
   }
 
   // Connect bot to room (simulate bot joining without actual socket connection)
-  private async connectBotToRoom(bot: BotInstance, ai: GenniaBotAI): Promise<boolean> {
+  private async connectBotToRoom(bot: BotInstance, ai: BlockStatesBotAI): Promise<boolean> {
     try {
       // Simulate bot joining by directly adding to room players
       if (!bot.room) {
@@ -228,7 +228,7 @@ export class BotManager {
   }
 
   // Handle bot events (simulated socket events)
-  private handleBotEvent(bot: BotInstance, ai: GenniaBotAI, event: string, ...args: any[]): void {
+  private handleBotEvent(bot: BotInstance, ai: BlockStatesBotAI, event: string, ...args: any[]): void {
     try {
       switch (event) {
         case 'get_room_info':
@@ -419,7 +419,7 @@ export class BotManager {
   async startDefaultBot(): Promise<void> {
     const config: BotConfig = {
       roomId: '1',
-      botName: 'GenniaBot-Default',
+      botName: 'BlockStatesBot-Default',
       difficulty: 'medium',
       maxReactionTime: 1000
     };

@@ -16,7 +16,7 @@ import {
   AttackQueue
 } from './types';
 
-export class GenniaBotAI {
+export class BlockStatesBotAI {
   private bot: BotInstance;
   private eventQueue: Array<{
     mapDiff: MapDiffData;

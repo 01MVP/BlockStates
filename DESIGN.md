@@ -1,4 +1,4 @@
-# Block Empire 设计系统
+# Block States 设计系统
 
 > 灰色背景 + 黑色线条 + 多玩家色彩的策略游戏 UI 设计规范
 
@@ -453,7 +453,7 @@ const playerColors = ['player-1', 'player-2', 'player-3', /* ... */];
 **最后更新**：2025-10-30
 **设计版本**：v2.0（Tailwind CSS 版本）
 **配置架构**：客户端独立配置（从 v2.0.1 开始）
-**Logo 版本**：`logo.svg` (block-empire-logo-clean-5)
+**Logo 版本**：`logo.svg` (block-states-logo-clean-5)
 
 ---
 

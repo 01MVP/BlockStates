@@ -1,4 +1,4 @@
-// cSpell:ignore uuidv block-empire
+// cSpell:ignore uuidv block-states
 import {
   useCallback,
   useMemo,
@@ -431,7 +431,7 @@ function MapEditor({ editMode }: { editMode: boolean }) {
     // Create a URL for the blob
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
-    link.download = `block-empire_custom_map_${username}_${mapName}.json`;
+    link.download = `block-states_custom_map_${username}_${mapName}.json`;
     link.href = url;
     document.body.appendChild(link);
     link.click();

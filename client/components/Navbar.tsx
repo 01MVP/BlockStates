@@ -15,15 +15,15 @@ type NavItem = {
 
 const navItems = [
   { href: '/', label: '首页' },
-  { href: 'https://docs.block-empire.com/', label: '文档', external: true },
-  { href: 'https://github.com/01MVP/BlockEmpire', label: 'GitHub', external: true },
+  { href: 'https://docs.block-states.com/', label: '文档', external: true },
+  { href: 'https://github.com/01MVP/BlockStates', label: 'GitHub', external: true },
   {
-    href: 'https://github.com/01MVP/BlockEmpire#开发机器人',
+    href: 'https://github.com/01MVP/BlockStates#开发机器人',
     label: '开发机器人',
     external: true,
   },
   {
-    href: 'https://github.com/01MVP/BlockEmpire/issues',
+    href: 'https://github.com/01MVP/BlockStates/issues',
     label: '反馈',
     external: true,
   },
@@ -93,7 +93,7 @@ function Navbar() {
               src="/img/logo.svg"
               width={32}
               height={32}
-              alt="Block Empire"
+              alt="Block States"
               priority
             />
           </Link>

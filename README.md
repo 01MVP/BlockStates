@@ -1,25 +1,25 @@
-## 方块帝国 (Block Empire)
+## 方块战国 (Block States)
 
 <h1 align="center">
-  <img src="client/public/img/favicon.png" style="height: 90px;"alt="方块帝国">
+  <img src="client/public/img/favicon.png" style="height: 90px;"alt="方块战国">
   <br>
-  <img src="client/public/img/block-empire-logo.png" style="height: 30px;"alt="方块帝国">
+  <img src="client/public/img/block-states-logo.png" style="height: 30px;"alt="方块战国">
 </h1>
 
-> [方块帝国](https://block-empire.com): 受 generals.io 启发的实时多人策略游戏
+> [方块战国](https://block-states.com): 受 generals.io 启发的实时多人策略游戏
 
 <h5 align="center">
-<img src="block-empire-pc.png" width="400" >
+<img src="block-states-pc.png" width="400" >
 
-方块帝国 PC 端演示
+方块战国 PC 端演示
 
-<img src="block-empire-mobile.png" width="300" >
+<img src="block-states-mobile.png" width="300" >
 
-方块帝国移动端演示
+方块战国移动端演示
 
 </h5>
 
-什么是方块帝国？
+什么是方块战国？
 
 - 一款实时多人策略游戏，目标是占领敌方主将同时保护自己的主将
 - 使用 React/Next.js/Socket/Express 技术栈
@@ -54,7 +54,7 @@
 ### 基础功能
 
 - [x] 创建自定义地图
-- [x] [游戏机器人](https://github.com/01MVP/BlockEmpire)
+- [x] [游戏机器人](https://github.com/01MVP/BlockStates)
 - [x] 游戏回放
 - [x] 移动端支持（拖拽攻击）
 - [x] 大厅 & 自定义游戏
@@ -122,7 +122,7 @@ docker-compose up -d
 - 查看 Makefile 中的 `make deploy` 和 `make restart`
 - 设置应用开机自启请参考：https://pm2.keymetrics.io/docs/usage/startup/
 
-## [开发路线图](https://github.com/01MVP/BlockEmpire/projects)
+## [开发路线图](https://github.com/01MVP/BlockStates/projects)
 
 ## 加入我们
 

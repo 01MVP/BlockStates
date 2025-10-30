@@ -27,7 +27,7 @@ const Login: React.FC<LoginProps> = (props) => {
           <div className="-mb-12 flex h-28 w-28 items-center justify-center rounded-2xl border-4 border-border-main bg-white shadow-xl">
             <Image
               src="/img/favicon.svg"
-              alt="Block Empire"
+              alt="Block States"
               width={80}
               height={80}
               priority

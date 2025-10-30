@@ -3,9 +3,9 @@ import Script from 'next/script';
 import '../styles/globals.css';
 
 export const metadata: Metadata = {
-  title: '方块帝国 (Block Empire)',
-  description: '方块帝国 - 一款基于 Next.js Socket.IO 构建的实时多人策略游戏',
-  keywords: '方块帝国, Block Empire, 多人游戏, 策略游戏',
+  title: '方块战国 (Block States)',
+  description: '方块战国 - 一款基于 Next.js Socket.IO 构建的实时多人策略游戏',
+  keywords: '方块战国, Block States, 多人游戏, 策略游戏',
   icons: {
     icon: [
       {

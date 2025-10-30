@@ -29,11 +29,11 @@ services:
     restart: unless-stopped
 
   # todo: fix symlink
-  # block-empire-server:
+  # block-states-server:
   #   build:
   #     context: .
   #     dockerfile: Dockerfile
-  #   container_name: block-empire-server
+  #   container_name: block-states-server
   #   depends_on:
   #     - postgres
   #   ports:
