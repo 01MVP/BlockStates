@@ -1,5 +1,5 @@
 import clsx from 'classnames';
-import { ChangeEvent, useState, useEffect } from 'react';
+import { ChangeEvent, MouseEvent, TouchEvent, useState, useEffect } from 'react';
 
 interface SliderMark {
   value: number;
@@ -44,9 +44,11 @@ export default function SliderBox({
     setLocalValue(numericValue);
   };
 
-  const handleRangeChangeCommitted = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleRangeChangeCommitted = (
+    event: MouseEvent<HTMLInputElement> | TouchEvent<HTMLInputElement>,
+  ) => {
     if (disabled) return;
-    const numericValue = Number(event.target.value);
+    const numericValue = Number((event.target as HTMLInputElement).value);
     handleChange(event.nativeEvent, numericValue);
   };
 
