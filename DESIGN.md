@@ -242,7 +242,7 @@ box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 - **完整设计展示**：`ui-design-system.html` - Tailwind CSS 可交互的完整设计系统
 - **简化版设计展示**：`ui-design-system-simplified.html` - 使用简化组件类的示例（基础组件）
 - **游戏组件展示**：`ui-game-components.html` - 游戏特定组件演示（推荐查看）⭐
-- **Tailwind 配置**：`tailwind.config.js` - 项目的 Tailwind 配置文件（包含所有设计 tokens）
+- **Tailwind 配置**：`client/tailwind.config.js` - 客户端的独立 Tailwind 配置文件（包含所有设计 tokens）
 - **组件类定义**：`client/styles/globals.css` - 自定义的简化组件类（btn-primary、card 等）
 - **CSS 变量（旧）**：`design-tokens.css` - 可直接导入的 CSS 变量（保留兼容性）
 - **Logo**：`logo.svg` - 官方 Logo（圆角柔和版）
@@ -280,10 +280,17 @@ npx tailwindcss init -p
 
 #### 2. 配置 tailwind.config.js
 ```javascript
-// 已创建好的配置文件：/tailwind.config.js
+// 已创建好的配置文件：client/tailwind.config.js
 // 包含完整的设计 tokens：玩家颜色、间距、圆角、阴影等
+// 注意：客户端使用独立配置，不依赖于根目录的配置文件
+// 项目使用 Next.js App Router，因此使用 app 目录而非 pages 目录
 module.exports = {
-  content: ['./app/**/*.{js,ts,jsx,tsx}', './components/**/*.{js,ts,jsx,tsx}'],
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './context/**/*.{js,ts,jsx,tsx,mdx}',
+    // ...其他路径
+  ],
   theme: {
     extend: {
       colors: {
@@ -443,8 +450,9 @@ const playerColors = ['player-1', 'player-2', 'player-3', /* ... */];
 
 ---
 
-**最后更新**：2025-10-29
+**最后更新**：2025-10-30
 **设计版本**：v2.0（Tailwind CSS 版本）
+**配置架构**：客户端独立配置（从 v2.0.1 开始）
 **Logo 版本**：`logo.svg` (block-empire-logo-clean-5)
 
 ---
@@ -452,9 +460,14 @@ const playerColors = ['player-1', 'player-2', 'player-3', /* ... */];
 ## 📚 快速开始
 
 1. **查看设计系统**：在浏览器中打开 `ui-design-system.html` 查看完整设计
-2. **配置 Tailwind**：复制 `tailwind.config.js` 到你的项目
+2. **配置 Tailwind**：查看 `client/tailwind.config.js` 了解完整的设计 token 配置
 3. **开始开发**：使用 Tailwind classes 如 `bg-player-1`、`text-text-primary` 等
 4. **参考文档**：查看上方的使用示例和组件规范
+
+**配置说明**：
+- 客户端使用独立的 Tailwind 配置文件 (`client/tailwind.config.js`)，包含所有设计 tokens
+- 根目录的 `tailwind.config.js` 仅供参考，不会被客户端构建使用
+- 这种架构确保客户端构建的独立性和稳定性
 
 如需帮助，请参考：
 - Tailwind 官方文档：https://tailwindcss.com/docs

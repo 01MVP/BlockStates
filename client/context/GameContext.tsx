@@ -98,8 +98,8 @@ const GameProvider: React.FC<GameProviderProp> = ({ children }) => {
     mapQueueDataReducer,
     []
   );
-  const socketRef = useRef<any>();
-  const attackQueueRef = useRef<any>();
+  const socketRef = useRef<any>(undefined);
+  const attackQueueRef = useRef<any>(undefined);
   const [roomUiStatus, setRoomUiStatus] = useState(RoomUiStatus.gameSetting);
   const [snackState, snackStateDispatch] = useReducer(snackStateReducer, {
     open: false,
