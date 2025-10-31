@@ -105,7 +105,7 @@ function Lobby() {
             <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div>
                 <p className="text-sm font-medium text-text-primary">
-                  方块帝国后端服务器
+                  方块战国后端服务器
                 </p>
                 <p className="text-xs text-text-muted">
                   {process.env.NEXT_PUBLIC_SERVER_API}

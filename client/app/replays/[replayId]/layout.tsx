@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '游戏回放 | 方块帝国',
+  title: '游戏回放 | 方块战国',
 };
 
 export default function ReplayLayout({

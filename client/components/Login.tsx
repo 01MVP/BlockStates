@@ -36,7 +36,7 @@ const Login: React.FC<LoginProps> = (props) => {
 
           <div className="card w-full pt-16 text-center shadow-lg">
             <h1 className="text-2xl font-semibold text-text-primary">
-              登录方块帝国
+              登录方块战国
             </h1>
             <p className="mt-2 text-sm text-text-muted">
               输入昵称即可加入战场，昵称长度不超过 15 个字符

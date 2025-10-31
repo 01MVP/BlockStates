@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: '地图创建器 | 方块帝国',
+  title: '地图创建器 | 方块战国',
 };
 
 export default function MapCreatorLayout({
