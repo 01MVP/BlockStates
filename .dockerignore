@@ -1,0 +1,12 @@
+.git
+.github
+node_modules
+client/node_modules
+client/.next
+server/node_modules
+server/dist
+server/records
+temp
+temp.md
+*.log
+Dockerfile.backup
