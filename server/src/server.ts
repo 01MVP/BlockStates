@@ -464,6 +464,14 @@ const io = new Server(server, {
 // Initialize BotManager
 const botManager = BotManager.getInstance(io);
 
+// Helper function to get bot AI instance
+function getBotAI(player: Player): any {
+  if ((player as any).isBot) {
+    return botManager.getBotAIByPlayerId(player.id);
+  }
+  return null;
+}
+
 function handleNeutralized(room: Room, player: Player) {
   if (player.king) {
     room.map.getBlock(player.king).kingBeDominated();
@@ -509,7 +517,7 @@ async function handleDisconnectInRoom(room: Room, player: Player, io: Server) {
   }
 }
 
-async function checkForcedStart(room: Room, io: Server) {
+export async function checkForcedStart(room: Room, io: Server) {
   let forceStartNum = forceStartOK[room.players.filter((player) => !player.spectating()).length];
 
   // Prevent race condition: only start if not already started or starting
@@ -518,7 +526,7 @@ async function checkForcedStart(room: Room, io: Server) {
   }
 }
 
-async function handleGame(room: Room, io: Server) {
+export async function handleGame(room: Room, io: Server) {
   if (room.gameStarted === false) {
     room.players.forEach((player) => {
       player.reset();
@@ -569,15 +577,25 @@ async function handleGame(room: Room, io: Server) {
     io.in(room.id).emit('update_room', room);
     io.in(room.id).emit('room_message', null, intro_message);
     room.players.forEach((player) => {
-      let player_socket = io.sockets.sockets.get(player.socket_id);
-      if (player_socket) {
-        let initGameInfo: initGameInfo = {
-          king: player.king ? { x: player.king.x, y: player.king.y } : { x: 0, y: 0 }, // spectator's king is null
-          mapWidth: room.map.width,
-          mapHeight: room.map.height,
-        };
-        player_socket.emit('game_started', initGameInfo);
+      let initGameInfo: initGameInfo = {
+        king: player.king ? { x: player.king.x, y: player.king.y } : { x: 0, y: 0 }, // spectator's king is null
+        mapWidth: room.map.width,
+        mapHeight: room.map.height,
+      };
+
+      // Check if this is a bot player
+      const botAI = getBotAI(player);
+      if (botAI) {
+        console.log(`Sending game_started to bot ${player.username}`);
+        botAI.onGameStarted(initGameInfo);
         player.patchView = new MapDiff();
+      } else {
+        // Regular player - use socket
+        let player_socket = io.sockets.sockets.get(player.socket_id);
+        if (player_socket) {
+          player_socket.emit('game_started', initGameInfo);
+          player.patchView = new MapDiff();
+        }
       }
     });
 
@@ -630,6 +648,7 @@ async function handleGame(room: Room, io: Server) {
 
         let room_sockets = await io.in(room.id).fetchSockets();
 
+        // Send updates to real players via socket
         for (let socket of room_sockets) {
           let playerIndex = getPlayerIndexBySocket(room, socket.id);
           if (playerIndex !== -1 && room.players[playerIndex].patchView && !room.players[playerIndex].disconnected) {
@@ -643,6 +662,23 @@ async function handleGame(room: Room, io: Server) {
               await room.players[playerIndex].patchView.patch(await room.map.getViewPlayer(room.players[playerIndex]));
             }
             socket.emit('game_update', room.players[playerIndex].patchView.data, room.map.turn, leaderBoardData);
+          }
+        }
+
+        // Send updates to bot players directly
+        for (let player of room.players) {
+          const botAI = getBotAI(player);
+          if (botAI && player.patchView && !player.disconnected && !player.isDead) {
+            if (
+              (room.deathSpectator && player.isDead) ||
+              !room.fogOfWar ||
+              player.spectating()
+            ) {
+              await player.patchView.patch(room.map.map);
+            } else {
+              await player.patchView.patch(await room.map.getViewPlayer(player));
+            }
+            botAI.onGameUpdate(player.patchView.data, room.map.turn, leaderBoardData);
           }
         }
 
@@ -677,6 +713,10 @@ async function handleGame(room: Room, io: Server) {
 
           room.gameStarted = false;
           room.forceStartNum = 0;
+
+          // Notify bots that game ended so they can re-ready up
+          botManager.handleGameEnded(room.id);
+
           io.in(room.id).emit('update_room', room);
 
           room.players.forEach((player) => {
@@ -784,6 +824,20 @@ io.on('connection', async (socket) => {
       player = room.players[playerIndex];
       player.disconnected = false;
       player.socket_id = socket.id;
+
+      // If game has already started, send game_started event to reconnecting player
+      if (room.gameStarted && room.map) {
+        let initGameInfo: initGameInfo = {
+          king: player.king ? { x: player.king.x, y: player.king.y } : { x: 0, y: 0 },
+          mapWidth: room.map.width,
+          mapHeight: room.map.height,
+        };
+        socket.emit('game_started', initGameInfo);
+        if (!player.patchView) {
+          player.patchView = new MapDiff();
+        }
+      }
+
       io.in(room.id).emit('room_message', player.minify(), 're-joined the lobby.');
       io.in(room.id).emit('update_room', room);
     }

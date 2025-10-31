@@ -41,7 +41,11 @@ export class BlockStatesBotAI {
   onGameStarted(initGameInfo: initGameInfo): void {
     this.bot.initGameInfo = initGameInfo;
     this.initMap(initGameInfo.mapWidth, initGameInfo.mapHeight);
-    console.log(`Bot ${this.bot.username} initialized with map size: ${initGameInfo.mapWidth}x${initGameInfo.mapHeight}`);
+
+    // Set initial general position from game info
+    if (initGameInfo.king && (initGameInfo.king.x !== 0 || initGameInfo.king.y !== 0)) {
+      this.bot.myGeneral = { x: initGameInfo.king.x, y: initGameInfo.king.y };
+    }
   }
 
   // Handle game updates
@@ -139,8 +143,9 @@ export class BlockStatesBotAI {
 
   private async handleMove(turnsCount: number): Promise<void> {
     try {
-      if (!this.bot.gameMap || !this.bot.initGameInfo || !this.bot.color || !this.bot.myGeneral)
+      if (!this.bot.gameMap || !this.bot.initGameInfo || this.bot.color === null || this.bot.color === undefined || !this.bot.myGeneral) {
         return;
+      }
 
       const mapWidth = this.bot.initGameInfo.mapWidth;
       const mapHeight = this.bot.initGameInfo.mapHeight;
@@ -457,7 +462,6 @@ export class BlockStatesBotAI {
     selected.sort((a, b) => b.val - a.val);
 
     const threat = selected[0];
-    console.log(`Bot ${this.bot.username} detected threat:`, threat);
     if (threat) {
       const myArmyCount = this.bot.leaderBoardData.filter(
         (x) => x[0] === this.bot.color
