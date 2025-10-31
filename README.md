@@ -6,8 +6,6 @@
   <img src="client/public/img/block-states-logo.png" style="height: 30px;"alt="方块战国">
 </h1>
 
-> [方块战国](https://block-states.com): 受 generals.io 启发的实时多人策略游戏
-
 <h5 align="center">
 <img src="block-states-pc.png" width="400" >
 
@@ -23,7 +21,6 @@
 
 - 一款实时多人策略游戏，目标是占领敌方主将同时保护自己的主将
 - 使用 React/Next.js/Socket/Express 技术栈
-- 灵感来自 [generals.io](https://generals.io)，未来将有不同于 generals.io 的游戏模式
 
 ## 游戏玩法
 
@@ -132,8 +129,3 @@ docker-compose up -d
 ## 许可证
 
 基于 GNU GENERAL PUBLIC LICENSE VERSION 3 许可证发布。详情请参见 `LICENSE.txt`。
-
-## 致谢
-
-- [MadJS](https://github.com/fluffybeastgames/MadJS/)
-- [generals-io-webapp](https://github.com/dhyegocalota/generals-io-webapp)
