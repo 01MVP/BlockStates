@@ -178,13 +178,13 @@ export interface QueueDisplayData {
 export type MapQueueData = QueueDisplayData[][]; //  same size as MapData
 
 export const TileType2Image: Record<TileType, string> = {
-  [TileType.King]: '/img/king.png',
-  [TileType.City]: '/img/city.png',
+  [TileType.King]: '/img/king.svg',
+  [TileType.City]: '/img/city.svg',
   [TileType.Fog]: '',
-  [TileType.Obstacle]: '/img/obstacle.png',
+  [TileType.Obstacle]: '/img/obstacle.svg',
   [TileType.Plain]: '',
-  [TileType.Mountain]: '/img/mountain.png',
-  [TileType.Swamp]: '/img/swamp.png',
+  [TileType.Mountain]: '/img/mountain.svg',
+  [TileType.Swamp]: '/img/swamp.svg',
 };
 
 export interface SnackState {
