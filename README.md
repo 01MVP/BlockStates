@@ -105,11 +105,56 @@ pnpm run dev
 
 #### Docker
 
-- 设置 PostgreSQL 和 PgAdmin 来管理数据
+- 本仓库的 Docker 镜像同时包含 server（Express + Socket.io）和 client（Next.js standalone）。容器启动时将自动启动两个进程：`dist/src/server.js`（监听 `SERVER_PORT`，默认 3001）和 Next.js standalone server（监听 3000）。
+- 必需环境变量：
+  - `DATABASE_URL`：PostgreSQL 连接串，根据部署环境自行配置。
+  - `CLIENT_URL`：允许的前端域名（空格分隔，`*` 表示任意域名；默认 `*`）。
+  - `SERVER_PORT`：后端监听端口（默认 3001）。
+  - `NEXT_PUBLIC_SERVER_API`（构建时 / 运行时可同时传入）：前端访问后端的基础地址，默认 `http://127.0.0.1:3001`。
+  - 可选 `RUN_DB_MIGRATIONS`：是否在启动时执行 `prisma migrate deploy`（默认 `true`）。
 
+##### 本地构建镜像
+
+```bash
+# 在仓库根目录执行
+docker build \
+  -t blockstates:local \
+  --build-arg NEXT_PUBLIC_SERVER_API="http://localhost:3001" \
+  .
 ```
-docker-compose up -d
+
+##### 本地运行
+
+```bash
+docker run --rm -p 3000:3000 -p 3001:3001 \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/db?schema=public" \
+  -e CLIENT_URL="http://localhost:3000" \
+  -e SERVER_PORT=3001 \
+  blockstates:local
 ```
+
+- 首次启动会自动运行 `prisma migrate deploy`。若不希望容器自动迁移，可额外传入 `-e RUN_DB_MIGRATIONS=false`。
+- 若容器需要访问公司内网数据库，请确保宿主机网络策略允许容器访问目标地址。
+
+##### 使用 GitHub Actions 构建的镜像
+
+- GitHub Actions 会在推送到 `main` 分支时自动构建并推送到 GitHub Container Registry（`ghcr.io/<owner>/<repo>:<tag>`）。
+- 必需的 GitHub Secrets：
+  - `NEXT_PUBLIC_SERVER_API`（可选，用于覆盖默认的前端 API 地址）
+- 手动拉取和运行：
+
+```bash
+# 假设仓库为 github.com/01MVP/BlockStates
+docker pull ghcr.io/01mvp/blockstates:latest
+docker run --rm -p 3000:3000 -p 3001:3001 \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/db?schema=public" \
+  -e CLIENT_URL="https://your-domain.com" \
+  -e SERVER_PORT=3001 \
+  ghcr.io/01mvp/blockstates:latest
+```
+
+- 生产环境下建议将 `CLIENT_URL` 配置为具体站点域名，并通过反向代理（Nginx/Caddy 等）暴露 `3000`、`3001` 或将两个端口整合。
+- 如果希望前端访问其他后端地址，可在运行时设置 `NEXT_PUBLIC_SERVER_API` 环境变量覆盖镜像构建时的默认值。
 
 ## 部署
 
