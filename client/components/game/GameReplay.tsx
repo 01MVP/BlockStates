@@ -6,7 +6,7 @@ import React, {
   useMemo,
   useReducer,
 } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import clsx from 'classnames';
 
 import {
@@ -63,8 +63,8 @@ export default function GameReplay(props: any) {
   } = useMap({ mapWidth, mapHeight });
 
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const replayId = searchParams.get('replayId') as string;
+  const params = useParams();
+  const replayId = params.replayId as string;
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent) => {
@@ -250,8 +250,8 @@ export default function GameReplay(props: any) {
 
   if (notFoundError) {
     return (
-      <div className="menu-container mx-auto mt-20 max-w-md p-6 text-center text-text-primary">
-        <p className="text-xl font-semibold">回放未找到</p>
+      <div className="menu-container mx-auto mt-20 max-w-md p-6 text-center">
+        <p className="text-xl font-semibold text-white">{notFoundError}</p>
       </div>
     );
   }
